@@ -1,6 +1,6 @@
 ﻿using Swashbuckle.AspNetCore.Filters;
 
-namespace GameOfLifeAPI.Models
+namespace GameOfLife.Api.Models
 {
     public class BoardStateModelExample : IExamplesProvider<BoardStateModel>
     {

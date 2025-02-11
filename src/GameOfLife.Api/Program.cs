@@ -1,65 +1,42 @@
 using GameOfLife.Api.Services;
-using GameOfLifeAPI.Models;
-using GameOfLifeAPI.Repositories;
-using GameOfLifeAPI.Services;
-using Microsoft.OpenApi.Models;
+using GameOfLife.Api.Repositories;
 using Serilog;
-using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure logging
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-
-// Add Serilog for file logging
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .WriteTo.File("./logs/GameOfLife.Logs.txt", rollingInterval: RollingInterval.Day)
+    .MinimumLevel.Debug()
+    .Enrich.FromLogContext()
+    .WriteTo.File("GameOfLife.Api.Log.txt")
     .CreateLogger();
 
-builder.Logging.AddSerilog();
+builder.Host.UseSerilog();
 
-// Add services to the container.
+// Configure services (dependency injection)
 builder.Services.AddControllers();
 
-// Register services
-builder.Services.AddSingleton<IBoardRepository, InMemoryBoardRepository>();
-builder.Services.AddScoped<IGameOfLifeService, GameOfLifeService>();
-builder.Services.AddSwaggerExamplesFromAssemblyOf<BoardStateModelExample>();
+// Register your custom services and repositories.
+// For example, if you're using an in-memory repository:
+builder.Services.AddSingleton<IInMemoryBoardRepository, InMemoryBoardRepository>();
+builder.Services.AddSingleton<IGameOfLifeService, GameOfLifeService>();
 
-// Add Swagger services
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "GameOfLife API", Version = "v1" });
-    c.ExampleFilters();
-});
+// Optional: Add Swagger for API documentation.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseRouting();
-
-// Enable middleware to serve generated Swagger as a JSON endpoint.
-app.UseSwagger();
-
-// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-// specifying the Swagger JSON endpoint.
-app.UseSwaggerUI(c =>
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "GameOfLife API v1");
-    c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
-});
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
+app.UseHttpsRedirection();
+app.UseAuthorization();
+
+// Map controller routes.
 app.MapControllers();
-
-// Handle application shutdown to save data
-var boardRepository = app.Services.GetRequiredService<IBoardRepository>();
-var lifetime = app.Lifetime;
-
-lifetime.ApplicationStopping.Register(async () =>
-{
-    await boardRepository.SaveAsync();
-});
 
 app.Run();

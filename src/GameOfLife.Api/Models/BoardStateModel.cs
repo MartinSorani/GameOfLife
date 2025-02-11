@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GameOfLifeAPI.Models
+namespace GameOfLife.Api.Models
 {
     public class BoardStateModel
     {

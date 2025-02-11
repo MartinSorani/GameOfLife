@@ -1,14 +1,14 @@
-﻿namespace GameOfLifeAPI.Models
+﻿namespace GameOfLife.Api.Models
 {
     public class Board
     {
         public Guid Id { get; set; }
-        public bool[][] CurrentState { get; set; }
+        public bool[,] CurrentState { get; set; }
 
-        public int Rows => CurrentState.Length;
-        public int Columns => CurrentState[0].Length;
+        public int Rows => CurrentState.GetLength(0);
+        public int Columns => CurrentState.GetLength(1);
 
-        public Board(bool[][] initialState)
+        public Board(bool[,] initialState)
         {
             Id = Guid.NewGuid();
             CurrentState = initialState;

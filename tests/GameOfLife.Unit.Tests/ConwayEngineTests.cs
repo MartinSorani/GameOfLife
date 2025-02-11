@@ -1,263 +1,293 @@
-﻿using GameOfLifeAPI.Utils;
+﻿using GameOfLife.Api.Utils;
 
-namespace GameOfLifeAPI.UnitTests
+namespace GameOfLife.UnitTests
 {
     public class ConwayEngineTests
     {
-        private bool StatesAreEqual(bool[][] state1, bool[][] state2)
+        // Helper method to compare two 2D boolean arrays.
+        private void AssertBoardsEqual(bool[,] expected, bool[,] actual)
         {
-            if (state1.Length != state2.Length)
-                return false;
+            int expectedRows = expected.GetLength(0);
+            int expectedCols = expected.GetLength(1);
+            int actualRows = actual.GetLength(0);
+            int actualCols = actual.GetLength(1);
 
-            for (int i = 0; i < state1.Length; i++)
+            Assert.Equal(expectedRows, actualRows);
+            Assert.Equal(expectedCols, actualCols);
+
+            for (int i = 0; i < expectedRows; i++)
             {
-                if (state1[i].Length != state2[i].Length)
-                    return false;
-
-                for (int j = 0; j < state1[i].Length; j++)
+                for (int j = 0; j < expectedCols; j++)
                 {
-                    if (state1[i][j] != state2[i][j])
-                        return false;
+                    Assert.Equal(expected[i, j], actual[i, j]);
                 }
             }
-            return true;
         }
 
         [Fact]
-        public void GetNextGeneration_ShouldReturnSameState_ForStillLifeBlock()
+        public void GetNextGeneration_EmptyBoard_RemainsEmpty()
         {
-            // Arrange: a 4x4 board with a 2x2 block in the center (still life)
-            bool[][] initialState = new bool[][]
-            {
-                new bool[] { false, false, false, false },
-                new bool[] { false, true,  true,  false },
-                new bool[] { false, true,  true,  false },
-                new bool[] { false, false, false, false }
-            };
+            // Arrange: an empty board (all cells dead)
+            bool[,] emptyBoard = new bool[3, 3];
 
-            // Act: compute the next generation
-            bool[][] nextState = ConwayEngine.GetNextGeneration(initialState);
+            // Act
+            bool[,] nextBoard = ConwayEngine.GetNextGeneration(emptyBoard);
 
-            // Assert: the block remains unchanged
-            Assert.True(StatesAreEqual(initialState, nextState));
+            // Assert: Expect the board to remain empty
+            bool[,] expectedBoard = new bool[3, 3];
+            AssertBoardsEqual(expectedBoard, nextBoard);
         }
 
         [Fact]
-        public void GetNextGeneration_ShouldOscillate_ForBlinker()
+        public void GetNextGeneration_BlockStillLife_RemainsUnchanged()
         {
-            // Arrange: a horizontal blinker
-            bool[][] initialState = new bool[][]
+            // Arrange: a block still life pattern (2x2 block in a 4x4 grid)
+            bool[,] initialBoard = new bool[4, 4]
             {
-                new bool[] { false, false, false },
-                new bool[] { true,  true,  true },
-                new bool[] { false, false, false }
+                { false, false, false, false },
+                { false, true,  true,  false },
+                { false, true,  true,  false },
+                { false, false, false, false }
             };
 
-            // Expected vertical blinker
-            bool[][] expectedState = new bool[][]
-            {
-                new bool[] { false, true,  false },
-                new bool[] { false, true,  false },
-                new bool[] { false, true,  false }
-            };
+            // Act
+            bool[,] nextBoard = ConwayEngine.GetNextGeneration(initialBoard);
 
-            // Act: compute the next generation
-            bool[][] nextState = ConwayEngine.GetNextGeneration(initialState);
-
-            // Assert: the blinker has oscillated
-            Assert.True(StatesAreEqual(expectedState, nextState));
+            // Assert: The block should remain unchanged
+            AssertBoardsEqual(initialBoard, nextBoard);
         }
 
         [Fact]
-        public void GetNextGeneration_ShouldOscillate_ForToad()
+        public void GetNextGeneration_BlinkerOscillator_TogglesCorrectly()
         {
-            // Arrange: a toad oscillator
-            bool[][] initialState = new bool[][]
+            // Arrange: a horizontal blinker in a 5x5 grid
+            bool[,] initialBoard = new bool[5, 5]
             {
-                new bool[] { false, false, false, false, false, false },
-                new bool[] { false, false, false, false, false, false },
-                new bool[] { false, false, true,  true,  true,  false },
-                new bool[] { false, true,  true,  true,  false, false },
-                new bool[] { false, false, false, false, false, false },
-                new bool[] { false, false, false, false, false, false }
+                { false, false, false, false, false },
+                { false, false, false, false, false },
+                { false, true,  true,  true,  false },
+                { false, false, false, false, false },
+                { false, false, false, false, false }
             };
 
-            // Expected next state
-            bool[][] expectedState = new bool[][]
+            // Expected: The blinker should flip to a vertical orientation
+            bool[,] expectedBoard = new bool[5, 5]
             {
-                new bool[] { false, false, false, false, false, false },
-                new bool[] { false, false, false, true,  false, false },
-                new bool[] { false, true,  false, false, true,  false },
-                new bool[] { false, true,  false, false, true,  false },
-                new bool[] { false, false, true,  false, false, false },
-                new bool[] { false, false, false, false, false, false }
+                { false, false, false, false, false },
+                { false, false, true,  false, false },
+                { false, false, true,  false, false },
+                { false, false, true,  false, false },
+                { false, false, false, false, false }
             };
 
-            // Act: compute the next generation
-            bool[][] nextState = ConwayEngine.GetNextGeneration(initialState);
+            // Act
+            bool[,] nextBoard = ConwayEngine.GetNextGeneration(initialBoard);
 
-            // Assert: the toad has oscillated
-            Assert.True(StatesAreEqual(expectedState, nextState));
+            // Assert
+            AssertBoardsEqual(expectedBoard, nextBoard);
         }
 
         [Fact]
-        public void GetNextGeneration_ShouldMove_ForGlider()
-        {
-            // Arrange: a glider pattern
-            bool[][] initialState = new bool[][]
-            {
-                new bool[] { false, false, true,  false, false },
-                new bool[] { true,  false, true,  false, false },
-                new bool[] { false, true,  true,  false, false },
-                new bool[] { false, false, false, false, false },
-                new bool[] { false, false, false, false, false }
-            };
-
-            // Expected next state
-            bool[][] expectedState = new bool[][]
-            {
-                new bool[] { false, false, false, false, false },
-                new bool[] { false, false, true,  false, false },
-                new bool[] { true,  false, true,  false, false },
-                new bool[] { false, true,  true,  false, false },
-                new bool[] { false, false, false, false, false }
-            };
-
-            // Act: compute the next generation
-            bool[][] nextState = ConwayEngine.GetNextGeneration(initialState);
-
-            // Assert: the glider has moved
-            Assert.True(StatesAreEqual(expectedState, nextState));
-        }
-
-        [Fact]
-        public void GetNextGeneration_ShouldReturnEmpty_ForAllDeadCells()
-        {
-            // Arrange: an empty board
-            bool[][] initialState = new bool[][]
-            {
-                new bool[] { false, false, false },
-                new bool[] { false, false, false },
-                new bool[] { false, false, false }
-            };
-
-            // Act: compute the next generation
-            bool[][] nextState = ConwayEngine.GetNextGeneration(initialState);
-
-            // Assert: the board remains empty
-            Assert.True(StatesAreEqual(initialState, nextState));
-        }
-
-        [Fact]
-        public void GetNextGeneration_ShouldHandle_EdgeCellsWrapping()
-        {
-            // Arrange: cells at the edges
-            bool[][] initialState = new bool[][]
-            {
-                new bool[] { true,  false, true },
-                new bool[] { false, false, false },
-                new bool[] { true,  false, true }
-            };
-
-            // Expected next state without wrapping (cells die due to underpopulation)
-            bool[][] expectedState = new bool[][]
-            {
-                new bool[] { false, false, false },
-                new bool[] { false, false, false },
-                new bool[] { false, false, false }
-            };
-
-            // Act: compute the next generation
-            bool[][] nextState = ConwayEngine.GetNextGeneration(initialState);
-
-            // Assert: edge cells handled correctly
-            Assert.True(StatesAreEqual(expectedState, nextState));
-        }
-
-        [Fact]
-        public void GetNextGeneration_ShouldReturnSameState_ForEmptyBoard()
-        {
-            // Arrange: an empty board (no rows)
-            bool[][] initialState = new bool[][] { };
-
-            // Act: compute the next generation
-            bool[][] nextState = ConwayEngine.GetNextGeneration(initialState);
-
-            // Assert: the board remains unchanged
-            Assert.True(StatesAreEqual(initialState, nextState));
-        }
-
-        [Fact]
-        public void GetNextGeneration_ShouldThrowException_ForNullInput()
-        {
-            // Arrange: null board
-            bool[][]? initialState = null;
-
-            // Act & Assert: expect ArgumentNullException
-            Assert.Throws<ArgumentNullException>(() => ConwayEngine.GetNextGeneration(initialState!));
-        }
-
-        [Fact]
-        public void GetNextGeneration_ShouldHandle_NonRectangularBoard()
-        {
-            // Arrange: a non-rectangular (jagged) board
-            bool[][] initialState = new bool[][]
-            {
-                new bool[] { true, false },
-                new bool[] { false, true, true },
-                new bool[] { true }
-            };
-
-            // Act & Assert: expect an exception due to inconsistent row lengths
-            Assert.Throws<InvalidOperationException>(() => ConwayEngine.GetNextGeneration(initialState));
-        }
-
-        [Fact]
-        public void GetNextGeneration_ShouldHandle_SingleCell()
+        public void GetNextGeneration_SingleLiveCell_Dies()
         {
             // Arrange: a board with a single live cell
-            bool[][] initialState = new bool[][]
+            bool[,] initialBoard = new bool[3, 3]
             {
-                new bool[] { true }
+                { false, false, false },
+                { false, true,  false },
+                { false, false, false }
             };
 
-            // Expected next state (cell dies due to underpopulation)
-            bool[][] expectedState = new bool[][]
-            {
-                new bool[] { false }
-            };
+            // Act
+            bool[,] nextBoard = ConwayEngine.GetNextGeneration(initialBoard);
 
-            // Act: compute the next generation
-            bool[][] nextState = ConwayEngine.GetNextGeneration(initialState);
-
-            // Assert: the single cell dies
-            Assert.True(StatesAreEqual(expectedState, nextState));
+            // Assert: A lone cell should die due to underpopulation
+            bool[,] expectedBoard = new bool[3, 3]; // all cells false
+            AssertBoardsEqual(expectedBoard, nextBoard);
         }
 
         [Fact]
-        public void GetNextGeneration_ShouldReviveCell_WithThreeNeighbors()
+        public void GetNextGeneration_FullBoard_ProducesCorrectPattern()
         {
-            // Arrange: a cell with exactly three neighbors becomes alive
-            bool[][] initialState = new bool[][]
+            // Arrange: a 3x3 full board (all cells alive)
+            bool[,] initialBoard = new bool[3, 3]
             {
-                new bool[] { false, true,  false },
-                new bool[] { true,  false, true },
-                new bool[] { false, false, false }
+                { true, true, true },
+                { true, true, true },
+                { true, true, true }
             };
 
-            // Expected next state
-            bool[][] expectedState = new bool[][]
+            // Calculation for a 3x3 full board:
+            // Corners (e.g., (0,0)): 3 neighbors  => lives.
+            // Edges (e.g., (0,1)): 5 neighbors     => dies.
+            // Center (1,1)): 8 neighbors           => dies.
+            bool[,] expectedBoard = new bool[3, 3]
             {
-                new bool[] { false, false, false },
-                new bool[] { false, true,  false },
-                new bool[] { false, false, false }
+                { true,  false, true },
+                { false, false, false },
+                { true,  false, true }
             };
 
-            // Act: compute the next generation
-            bool[][] nextState = ConwayEngine.GetNextGeneration(initialState);
+            // Act
+            bool[,] nextBoard = ConwayEngine.GetNextGeneration(initialBoard);
 
-            // Assert: the center cell becomes alive
-            Assert.True(StatesAreEqual(expectedState, nextState));
+            // Assert
+            AssertBoardsEqual(expectedBoard, nextBoard);
         }
+
+        [Fact]
+        public void GetNextGeneration_OneRowBoard_WorksCorrectly()
+        {
+            // Arrange: a board with a single row
+            bool[,] initialBoard = new bool[1, 5]
+            {
+                { false, true, true, true, false }
+            };
+
+            // In a one-row board, only horizontal neighbors count.
+            // For index 1: live with one live neighbor (index 2) -> dies.
+            // For index 2: live with two neighbors -> survives.
+            // For index 3: live with one neighbor -> dies.
+            bool[,] expectedBoard = new bool[1, 5]
+            {
+                { false, false, true, false, false }
+            };
+
+            // Act
+            bool[,] nextBoard = ConwayEngine.GetNextGeneration(initialBoard);
+
+            // Assert
+            AssertBoardsEqual(expectedBoard, nextBoard);
+        }
+
+        [Fact]
+        public void GetNextGeneration_OneColumnBoard_WorksCorrectly()
+        {
+            // Arrange: a board with a single column
+            bool[,] initialBoard = new bool[5, 1]
+            {
+                { false },
+                { true },
+                { true },
+                { true },
+                { false }
+            };
+
+            // Expected behavior is similar to the one-row case.
+            bool[,] expectedBoard = new bool[5, 1]
+            {
+                { false },
+                { false },
+                { true },
+                { false },
+                { false }
+            };
+
+            // Act
+            bool[,] nextBoard = ConwayEngine.GetNextGeneration(initialBoard);
+
+            // Assert
+            AssertBoardsEqual(expectedBoard, nextBoard);
+        }
+
+        [Fact]
+        public void GetNextGeneration_NullBoard_ThrowsArgumentNullException()
+        {
+            // Arrange & Act & Assert: Passing a null board should throw an exception.
+            Assert.Throws<ArgumentNullException>(() => ConwayEngine.GetNextGeneration(null));
+        }
+
+        [Fact]
+        public void GetNextGeneration_GliderPattern_EvolvesCorrectly()
+        {
+            // Arrange:
+            // Create a 7x7 board and place a glider pattern with an offset.
+            bool[,] initialBoard = new bool[7, 7];
+            int offset = 1; // offset to place the glider away from edges
+
+            // Place initial glider pattern.
+            initialBoard[offset + 0, offset + 1] = true;
+            initialBoard[offset + 1, offset + 2] = true;
+            initialBoard[offset + 2, offset + 0] = true;
+            initialBoard[offset + 2, offset + 1] = true;
+            initialBoard[offset + 2, offset + 2] = true;
+
+            // Build expected board for next generation.
+            bool[,] expectedBoard = new bool[7, 7];
+            expectedBoard[offset + 1, offset + 0] = true;
+            expectedBoard[offset + 1, offset + 2] = true;
+            expectedBoard[offset + 2, offset + 1] = true;
+            expectedBoard[offset + 2, offset + 2] = true;
+            expectedBoard[offset + 3, offset + 1] = true;
+
+            // Act
+            bool[,] nextBoard = ConwayEngine.GetNextGeneration(initialBoard);
+
+            // Assert
+            AssertBoardsEqual(expectedBoard, nextBoard);
+        }
+
+
+        [Fact]
+        public void GetNextGeneration_7x7BlockStillLife_RemainsUnchanged()
+        {
+            // Arrange:
+            // Create a 7x7 board with a 2x2 block (stable pattern) in the center.
+            // A 2x2 block should remain unchanged from generation to generation.
+            bool[,] initialBoard = new bool[7, 7];
+            initialBoard[3, 3] = true;
+            initialBoard[3, 4] = true;
+            initialBoard[4, 3] = true;
+            initialBoard[4, 4] = true;
+
+            // The expected board is identical to the initial board.
+            bool[,] expectedBoard = new bool[7, 7];
+            expectedBoard[3, 3] = true;
+            expectedBoard[3, 4] = true;
+            expectedBoard[4, 3] = true;
+            expectedBoard[4, 4] = true;
+
+            // Act
+            bool[,] nextBoard = ConwayEngine.GetNextGeneration(initialBoard);
+
+            // Assert
+            AssertBoardsEqual(expectedBoard, nextBoard);
+        }
+
+        [Fact]
+        public void GetNextGeneration_7x7GliderEvolvesCorrectlyOverMultipleGenerations()
+        {
+            // Arrange:
+            // Create a 7x7 board with a glider pattern placed with an offset.
+            // After 4 generations, a glider shifts one cell diagonally.
+            bool[,] board = new bool[7, 7];
+            int offset = 1;
+
+            // Place initial glider pattern.
+            board[offset + 0, offset + 1] = true;
+            board[offset + 1, offset + 2] = true;
+            board[offset + 2, offset + 0] = true;
+            board[offset + 2, offset + 1] = true;
+            board[offset + 2, offset + 2] = true;
+
+            // Act: Evolve the board for 4 generations.
+            bool[,] current = board;
+            for (int gen = 0; gen < 4; gen++)
+            {
+                current = ConwayEngine.GetNextGeneration(current);
+            }
+
+            // Expected board after 4 generations (shift by (1,1) relative to initial pattern):
+            bool[,] expectedBoard = new bool[7, 7];
+            expectedBoard[offset + 0 + 1, offset + 1 + 1] = true;
+            expectedBoard[offset + 1 + 1, offset + 2 + 1] = true;
+            expectedBoard[offset + 2 + 1, offset + 0 + 1] = true;
+            expectedBoard[offset + 2 + 1, offset + 1 + 1] = true;
+            expectedBoard[offset + 2 + 1, offset + 2 + 1] = true;
+
+            // Act and assert:
+            AssertBoardsEqual(expectedBoard, current);
+        }
+
     }
 }
