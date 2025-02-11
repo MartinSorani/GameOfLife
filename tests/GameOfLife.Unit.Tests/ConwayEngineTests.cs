@@ -191,10 +191,10 @@ namespace GameOfLifeAPI.UnitTests
         public void GetNextGeneration_ShouldThrowException_ForNullInput()
         {
             // Arrange: null board
-            bool[][] initialState = null;
+            bool[][]? initialState = null;
 
             // Act & Assert: expect ArgumentNullException
-            Assert.Throws<ArgumentNullException>(() => ConwayEngine.GetNextGeneration(initialState));
+            Assert.Throws<ArgumentNullException>(() => ConwayEngine.GetNextGeneration(initialState!));
         }
 
         [Fact]

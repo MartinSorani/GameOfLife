@@ -1,19 +1,22 @@
-﻿namespace GameOfLifeAPI.Utils
+﻿using Serilog;
+
+namespace GameOfLifeAPI.Utils
 {
     /// <summary>
     /// Provides functionality to compute the next generation in Conway's Game of Life.
     /// </summary>
     public static class ConwayEngine
     {
+        private static readonly Serilog.ILogger Logger = Log.ForContext(typeof(ConwayEngine));
+
         /// <summary>
         /// Computes the next generation of the game board.
         /// </summary>
         /// <param name="currentState">The current state of the game board.</param>
-        /// <param name="logger">An optional logger for tracing computations.</param>
         /// <returns>The next state of the game board.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the currentState is null.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the board is not rectangular.</exception>
-        public static bool[][] GetNextGeneration(bool[][] currentState, ILogger? logger = null)
+        public static bool[][] GetNextGeneration(bool[][] currentState)
         {
             if (currentState == null)
                 throw new ArgumentNullException(
@@ -23,7 +26,7 @@
 
             if (currentState.Length == 0)
             {
-                logger?.LogWarning("The board is empty. Returning the empty board as is.");
+                Logger.Warning("The board is empty. Returning the empty board as is.");
                 return currentState; // Return empty board as is.
             }
 
@@ -32,7 +35,7 @@
 
             if (cols == 0)
             {
-                logger?.LogWarning("The board has no columns. Returning the board as is.");
+                Logger.Warning("The board has no columns. Returning the board as is.");
                 return currentState; // Return empty board as is.
             }
 
@@ -55,30 +58,34 @@
                     bool isAlive = currentState[i][j];
 
                     // Log current cell status
-                    logger?.LogDebug(
-                        $"Processing cell ({i},{j}): IsAlive={isAlive}, AliveNeighbors={aliveNeighbors}"
+                    Logger.Debug(
+                        "Processing cell ({Row},{Col}): IsAlive={IsAlive}, AliveNeighbors={AliveNeighbors}",
+                        i, j, isAlive, aliveNeighbors
                     );
 
                     if (isAlive)
                     {
                         // Any live cell with two or three live neighbours survives.
                         nextState[i][j] = aliveNeighbors == 2 || aliveNeighbors == 3;
-                        logger?.LogDebug(
-                            $"Cell ({i},{j}) is alive with {aliveNeighbors} neighbors: {(nextState[i][j] ? "survives" : "dies")}."
+                        Logger.Debug(
+                            "Cell ({Row},{Col}) is alive with {AliveNeighbors} neighbors: {Status}.",
+                            i, j, aliveNeighbors, nextState[i][j] ? "survives" : "dies"
                         );
                     }
                     else
                     {
                         // Any dead cell with exactly three live neighbours becomes a live cell.
                         nextState[i][j] = aliveNeighbors == 3;
-                        logger?.LogDebug(
-                            $"Cell ({i},{j}) is dead with {aliveNeighbors} neighbors: {(nextState[i][j] ? "becomes alive" : "stays dead")}."
+                        Logger.Debug(
+                            "Cell ({Row},{Col}) is dead with {AliveNeighbors} neighbors: {Status}.",
+                            i, j, aliveNeighbors, nextState[i][j] ? "becomes alive" : "stays dead"
                         );
                     }
 
                     // Log next cell status
-                    logger?.LogDebug(
-                        $"Cell ({i},{j}) will be {(nextState[i][j] ? "alive" : "dead")} in next generation."
+                    Logger.Debug(
+                        "Cell ({Row},{Col}) will be {Status} in next generation.",
+                        i, j, nextState[i][j] ? "alive" : "dead"
                     );
                 }
             }
