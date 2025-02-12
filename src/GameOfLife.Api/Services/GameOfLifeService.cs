@@ -51,7 +51,17 @@ namespace GameOfLife.Api.Services
         /// <exception cref="ArgumentException">Thrown when the board is not found.</exception>
         public bool[,] GetNextState(Guid boardId)
         {
-            var board = _boardRepository.GetBoard(boardId);
+            Board board;
+            try
+            {
+                board = _boardRepository.GetBoard(boardId);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.Warning(ex, "GetNextState: Board with ID {BoardId} not found", boardId);
+                throw new ArgumentException("Board not found", nameof(boardId));
+            }
+
             var nextState = ConwayEngine.GetNextGeneration(board.CurrentState);
             board.CurrentState = nextState;
             _boardRepository.UpdateBoard(board);
@@ -75,7 +85,16 @@ namespace GameOfLife.Api.Services
                 throw new ArgumentOutOfRangeException(nameof(steps), "Steps must be non-negative");
             }
 
-            var board = _boardRepository.GetBoard(boardId);
+            Board board;
+            try
+            {
+                board = _boardRepository.GetBoard(boardId);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.Warning(ex, "GetStateAfterSteps: Board with ID {BoardId} not found", boardId);
+                throw new ArgumentException("Board not found", nameof(boardId));
+            }
 
             bool[,] state = board.CurrentState;
             for (int i = 0; i < steps; i++)
@@ -107,7 +126,16 @@ namespace GameOfLife.Api.Services
                 throw new ArgumentOutOfRangeException(nameof(maxIterations), "Max iterations must be positive");
             }
 
-            var board = _boardRepository.GetBoard(boardId);
+            Board board;
+            try
+            {
+                board = _boardRepository.GetBoard(boardId);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.Warning(ex, "GetFinalState: Board with ID {BoardId} not found", boardId);
+                throw new ArgumentException("Board not found", nameof(boardId));
+            }
 
             bool[,] currentState = board.CurrentState;
             int iterations = 0;

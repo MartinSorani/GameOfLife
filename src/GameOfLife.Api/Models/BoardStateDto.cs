@@ -1,4 +1,6 @@
-﻿namespace GameOfLife.Api.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GameOfLife.Api.Models
 {
     /// <summary>
     /// Request DTO for uploading a new board state.
@@ -6,6 +8,8 @@
     /// </summary>
     public class BoardStateDto
     {
+        [Required]
+        [MinLength(1, ErrorMessage = "Board must have at least one row.")]
         public bool[][] Board { get; set; } = new bool[][]
         {
             new bool[] { true, false, true },

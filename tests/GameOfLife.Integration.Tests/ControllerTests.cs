@@ -1,42 +1,50 @@
 ﻿using GameOfLife.Api.Models;
 using Microsoft.AspNetCore.Mvc.Testing;
-using System.Net;
 using RestSharp;
+using System.Net;
 
 namespace GameOfLife.Integration.Tests
 {
+    [Trait("Category", "Integration")]
     public class ControllerTests : IClassFixture<WebApplicationFactory<Program>>
     {
         private readonly RestClient _client;
+        private readonly WebApplicationFactory<Program> _factory;
 
         public ControllerTests(WebApplicationFactory<Program> factory)
         {
-            if (factory is null)
-            {
-                throw new ArgumentNullException(nameof(factory));
-            }
+            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
 
-            var clientOptions = new RestClientOptions
+            // Create a test HttpClient from the factory.
+            var httpClient = _factory.CreateClient();
+
+            // Pass the HttpClient directly to the RestClient.
+            _client = new RestClient(httpClient);
+        }
+
+        /// <summary>
+        /// Helper method that returns a sample board state.
+        /// </summary>
+        private BoardStateDto CreateSampleBoard()
+        {
+            return new BoardStateDto
             {
-                BaseUrl = new Uri("http://localhost")
+                Board = new bool[][]
+                {
+                    new bool[] { false, true, false },
+                    new bool[] { true, false, true },
+                    new bool[] { false, true, false }
+                }
             };
-            _client = new RestClient(clientOptions);
         }
 
         [Fact]
         public async Task UploadBoard_ValidBoard_ReturnsOk()
         {
             // Arrange
-            var boardState = new BoardStateDto
-            {
-                Board = new bool[][]
-                {
-                        new bool[] { false, true, false },
-                        new bool[] { true, false, true },
-                        new bool[] { false, true, false }
-                }
-            };
-            var request = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
+            var boardState = CreateSampleBoard();
+            var request = new RestRequest("/api/boards", Method.Post)
+                .AddJsonBody(boardState);
 
             // Act
             var response = await _client.ExecuteAsync<Guid>(request);
@@ -49,8 +57,12 @@ namespace GameOfLife.Integration.Tests
         [Fact]
         public async Task UploadBoard_NullBoard_ReturnsBadRequest()
         {
+            // Arrange
+            var emptyBoardDto = new BoardStateDto { Board = Array.Empty<bool[]>() };
+            var request = new RestRequest("/api/boards", Method.Post)
+                .AddJsonBody(emptyBoardDto);
+
             // Act
-            var request = new RestRequest("/api/boards", Method.Post).AddJsonBody(new BoardStateDto { Board = Array.Empty<bool[]>() });
             var response = await _client.ExecuteAsync(request);
 
             // Assert
@@ -61,16 +73,9 @@ namespace GameOfLife.Integration.Tests
         public async Task GetNextState_ValidBoardId_ReturnsOk()
         {
             // Arrange
-            var boardState = new BoardStateDto
-            {
-                Board = new bool[][]
-                {
-                        new bool[] { false, true, false },
-                        new bool[] { true, false, true },
-                        new bool[] { false, true, false }
-                }
-            };
-            var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
+            var boardState = CreateSampleBoard();
+            var uploadRequest = new RestRequest("/api/boards", Method.Post)
+                .AddJsonBody(boardState);
             var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
 
@@ -81,6 +86,8 @@ namespace GameOfLife.Integration.Tests
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Data);
+            Assert.NotNull(response.Data.Board);
+            Assert.NotEmpty(response.Data.Board);
         }
 
         [Fact]
@@ -98,16 +105,9 @@ namespace GameOfLife.Integration.Tests
         public async Task GetStateAfterSteps_ValidBoardId_ReturnsOk()
         {
             // Arrange
-            var boardState = new BoardStateDto
-            {
-                Board = new bool[][]
-                {
-                        new bool[] { false, true, false },
-                        new bool[] { true, false, true },
-                        new bool[] { false, true, false }
-                }
-            };
-            var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
+            var boardState = CreateSampleBoard();
+            var uploadRequest = new RestRequest("/api/boards", Method.Post)
+                .AddJsonBody(boardState);
             var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
 
@@ -118,6 +118,8 @@ namespace GameOfLife.Integration.Tests
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Data);
+            Assert.NotNull(response.Data.Board);
+            Assert.NotEmpty(response.Data.Board);
         }
 
         [Fact]
@@ -135,16 +137,9 @@ namespace GameOfLife.Integration.Tests
         public async Task GetFinalState_ValidBoardId_ReturnsOk()
         {
             // Arrange
-            var boardState = new BoardStateDto
-            {
-                Board = new bool[][]
-                {
-                        new bool[] { false, true, false },
-                        new bool[] { true, false, true },
-                        new bool[] { false, true, false }
-                }
-            };
-            var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
+            var boardState = CreateSampleBoard();
+            var uploadRequest = new RestRequest("/api/boards", Method.Post)
+                .AddJsonBody(boardState);
             var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
 
@@ -155,6 +150,8 @@ namespace GameOfLife.Integration.Tests
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Data);
+            Assert.NotNull(response.Data.Board);
+            Assert.NotEmpty(response.Data.Board);
         }
 
         [Fact]

@@ -32,10 +32,10 @@ namespace GameOfLife.Api.Controllers
         [SwaggerRequestExample(typeof(BoardStateDto), typeof(BoardDtoExample))]
         public ActionResult<Guid> UploadBoard([FromBody] BoardStateDto request)
         {
-            if (request?.Board == null)
+            if (request?.Board == null || request.Board.Length == 0)
             {
-                _logger.Warning("UploadBoard: Board state must be provided.");
-                return BadRequest("Board state must be provided.");
+                _logger.Warning("UploadBoard: Board state must be provided and cannot be empty.");
+                return BadRequest("Board state must be provided and cannot be empty.");
             }
 
             try
@@ -52,6 +52,7 @@ namespace GameOfLife.Api.Controllers
                     _logger.Warning(ex, "UploadBoard: Invalid board state provided.");
                     return BadRequest(ex.Message);
                 }
+
                 Guid boardId = _gameService.UploadBoard(board2D);
                 _logger.Information("UploadBoard: Board uploaded successfully with Id {BoardId}.", boardId);
                 return Ok(boardId);

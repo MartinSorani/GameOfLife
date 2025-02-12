@@ -2,6 +2,7 @@
 
 namespace GameOfLife.UnitTests
 {
+    [Trait("Category", "Unit")]
     public class ConwayEngineTests
     {
         /// <summary>

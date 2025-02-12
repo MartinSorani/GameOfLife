@@ -16,6 +16,9 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+// Register Serilog.ILogger so it can be injected where needed.
+builder.Services.AddSingleton<Serilog.ILogger>(Log.Logger);
+
 // Configure services
 builder.Services.AddControllers();
 

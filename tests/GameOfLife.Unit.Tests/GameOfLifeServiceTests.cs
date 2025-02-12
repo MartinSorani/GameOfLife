@@ -5,6 +5,7 @@ using Moq;
 
 namespace GameOfLife.Unit.Tests
 {
+    [Trait("Category", "Unit")]
     public class GameOfLifeServiceTests
     {
         /// <summary>
