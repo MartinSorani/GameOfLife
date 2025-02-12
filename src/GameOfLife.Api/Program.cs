@@ -6,11 +6,12 @@ using GameOfLife.Api.Examples;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure logging
+// Read configuration from appsettings.json
+var configuration = builder.Configuration;
+
+// Configure Serilog to read from configuration
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
-    .Enrich.FromLogContext()
-    .WriteTo.File("./logs/GameOfLife.Logs.txt")
+    .ReadFrom.Configuration(configuration)
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -46,3 +47,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

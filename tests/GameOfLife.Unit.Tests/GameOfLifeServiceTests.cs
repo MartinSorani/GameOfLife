@@ -45,6 +45,9 @@ namespace GameOfLife.Unit.Tests
         }
 
         #region UploadBoard tests
+        /// <summary>
+        /// Tests that UploadBoard throws an ArgumentNullException when a null board is provided.
+        /// </summary>
         [Fact]
         public void UploadBoard_NullBoard_ThrowsArgumentNullException()
         {
@@ -55,6 +58,9 @@ namespace GameOfLife.Unit.Tests
             Assert.Throws<ArgumentNullException>(() => service.UploadBoard(null!));
         }
 
+        /// <summary>
+        /// Tests that UploadBoard returns a non-empty Guid and stores the board correctly when a valid board is provided.
+        /// </summary>
         [Fact]
         public void UploadBoard_ValidBoard_ReturnsNonEmptyGuidAndStoresBoard()
         {
@@ -74,6 +80,9 @@ namespace GameOfLife.Unit.Tests
         #endregion
 
         #region GetNextState tests
+        /// <summary>
+        /// Tests that GetNextState throws an ArgumentException when the board is not found.
+        /// </summary>
         [Fact]
         public void GetNextState_BoardNotFound_ThrowsArgumentException()
         {
@@ -85,6 +94,9 @@ namespace GameOfLife.Unit.Tests
             Assert.Throws<ArgumentException>(() => service.GetNextState(nonExistentId));
         }
 
+        /// <summary>
+        /// Tests that GetNextState returns the correct next state for a block still life pattern.
+        /// </summary>
         [Fact]
         public void GetNextState_ReturnsCorrectNextState_ForBlockStillLife()
         {
@@ -92,10 +104,10 @@ namespace GameOfLife.Unit.Tests
             var service = CreateService();
             bool[,] board = new bool[4, 4]
             {
-                    { false, false, false, false },
-                    { false, true,  true,  false },
-                    { false, true,  true,  false },
-                    { false, false, false, false }
+                        { false, false, false, false },
+                        { false, true,  true,  false },
+                        { false, true,  true,  false },
+                        { false, false, false, false }
             };
             Guid boardId = service.UploadBoard(board);
 
@@ -114,6 +126,9 @@ namespace GameOfLife.Unit.Tests
         #endregion
 
         #region GetStateAfterSteps tests
+        /// <summary>
+        /// Tests that GetStateAfterSteps throws an ArgumentOutOfRangeException when a negative number of steps is provided.
+        /// </summary>
         [Fact]
         public void GetStateAfterSteps_NegativeSteps_ThrowsArgumentOutOfRangeException()
         {
@@ -126,6 +141,9 @@ namespace GameOfLife.Unit.Tests
             Assert.Throws<ArgumentOutOfRangeException>(() => service.GetStateAfterSteps(boardId, -1));
         }
 
+        /// <summary>
+        /// Tests that GetStateAfterSteps throws an ArgumentException when the board is not found.
+        /// </summary>
         [Fact]
         public void GetStateAfterSteps_BoardNotFound_ThrowsArgumentException()
         {
@@ -137,6 +155,9 @@ namespace GameOfLife.Unit.Tests
             Assert.Throws<ArgumentException>(() => service.GetStateAfterSteps(nonExistentId, 3));
         }
 
+        /// <summary>
+        /// Tests that GetStateAfterSteps returns the correct state after multiple generations for a blinker pattern.
+        /// </summary>
         [Fact]
         public void GetStateAfterSteps_ReturnsCorrectStateAfterMultipleGenerations()
         {
@@ -171,6 +192,9 @@ namespace GameOfLife.Unit.Tests
         #endregion
 
         #region Get Final State Tests
+        /// <summary>
+        /// Tests that GetFinalState throws an ArgumentOutOfRangeException when maxIterations is less than or equal to zero.
+        /// </summary>
         [Fact]
         public void GetFinalState_MaxIterationsLessThanOrEqualZero_ThrowsArgumentOutOfRangeException()
         {
@@ -183,6 +207,9 @@ namespace GameOfLife.Unit.Tests
             Assert.Throws<ArgumentOutOfRangeException>(() => service.GetFinalState(boardId, 0));
         }
 
+        /// <summary>
+        /// Tests that GetFinalState throws an ArgumentException when the board is not found.
+        /// </summary>
         [Fact]
         public void GetFinalState_BoardNotFound_ThrowsArgumentException()
         {
@@ -194,6 +221,9 @@ namespace GameOfLife.Unit.Tests
             Assert.Throws<ArgumentException>(() => service.GetFinalState(nonExistentId, 10));
         }
 
+        /// <summary>
+        /// Tests that GetFinalState returns the final state when a stable state is reached.
+        /// </summary>
         [Fact]
         public void GetFinalState_StableStateReached_ReturnsFinalState()
         {
@@ -215,6 +245,9 @@ namespace GameOfLife.Unit.Tests
             }
         }
 
+        /// <summary>
+        /// Tests that GetFinalState throws an InvalidOperationException when an oscillatory pattern is provided.
+        /// </summary>
         [Fact]
         public void GetFinalState_OscillatoryPattern_ThrowsInvalidOperationException()
         {
