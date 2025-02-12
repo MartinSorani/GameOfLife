@@ -1,5 +1,7 @@
 ﻿using GameOfLife.Api.Repositories;
 using GameOfLife.Api.Services;
+using Serilog;
+using Moq;
 
 namespace GameOfLife.Unit.Tests
 {
@@ -11,7 +13,8 @@ namespace GameOfLife.Unit.Tests
         private IGameOfLifeService CreateService()
         {
             IBoardRepository repository = new InMemoryBoardRepository();
-            return new GameOfLifeService(repository);
+            var mockLogger = new Mock<ILogger>();
+            return new GameOfLifeService(repository, mockLogger.Object);
         }
 
         /// <summary>
@@ -94,10 +97,10 @@ namespace GameOfLife.Unit.Tests
             var service = CreateService();
             bool[,] board = new bool[4, 4]
             {
-                { false, false, false, false },
-                { false, true,  true,  false },
-                { false, true,  true,  false },
-                { false, false, false, false }
+                    { false, false, false, false },
+                    { false, true,  true,  false },
+                    { false, true,  true,  false },
+                    { false, false, false, false }
             };
             Guid boardId = service.UploadBoard(board);
 

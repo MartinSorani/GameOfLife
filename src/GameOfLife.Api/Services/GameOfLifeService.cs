@@ -52,12 +52,6 @@ namespace GameOfLife.Api.Services
         public bool[,] GetNextState(Guid boardId)
         {
             var board = _boardRepository.GetBoard(boardId);
-            if (board == null)
-            {
-                _logger.Error("GetNextState: Board not found with ID {BoardId}", boardId);
-                throw new ArgumentException("Board not found", nameof(boardId));
-            }
-
             var nextState = ConwayEngine.GetNextGeneration(board.CurrentState);
             board.CurrentState = nextState;
             _boardRepository.UpdateBoard(board);
@@ -82,11 +76,6 @@ namespace GameOfLife.Api.Services
             }
 
             var board = _boardRepository.GetBoard(boardId);
-            if (board == null)
-            {
-                _logger.Error("GetStateAfterSteps: Board not found with ID {BoardId}", boardId);
-                throw new ArgumentException("Board not found", nameof(boardId));
-            }
 
             bool[,] state = board.CurrentState;
             for (int i = 0; i < steps; i++)
@@ -119,11 +108,6 @@ namespace GameOfLife.Api.Services
             }
 
             var board = _boardRepository.GetBoard(boardId);
-            if (board == null)
-            {
-                _logger.Error("GetFinalState: Board not found with ID {BoardId}", boardId);
-                throw new ArgumentException("Board not found", nameof(boardId));
-            }
 
             bool[,] currentState = board.CurrentState;
             int iterations = 0;

@@ -16,7 +16,7 @@ namespace GameOfLife.Api.Repositories
         public Board GetBoard(Guid boardId)
         {
             _boards.TryGetValue(boardId, out var board);
-            return board ?? throw new KeyNotFoundException($"Board with ID {boardId} not found.");
+            return board ?? throw new ArgumentException($"Board with ID {boardId} not found.");
         }
 
         public void UpdateBoard(Board board)
