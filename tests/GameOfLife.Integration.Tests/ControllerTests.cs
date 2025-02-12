@@ -38,6 +38,9 @@ namespace GameOfLife.Integration.Tests
             };
         }
 
+        /// <summary>
+        /// Tests that uploading a valid board returns an OK status and a non-empty GUID.
+        /// </summary>
         [Fact]
         public async Task UploadBoard_ValidBoard_ReturnsOk()
         {
@@ -54,6 +57,9 @@ namespace GameOfLife.Integration.Tests
             Assert.NotEqual(Guid.Empty, response.Data);
         }
 
+        /// <summary>
+        /// Tests that uploading a null board returns a BadRequest status.
+        /// </summary>
         [Fact]
         public async Task UploadBoard_NullBoard_ReturnsBadRequest()
         {
@@ -69,6 +75,9 @@ namespace GameOfLife.Integration.Tests
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
+        /// <summary>
+        /// Tests that getting the next state of a valid board ID returns an OK status and a non-null board state.
+        /// </summary>
         [Fact]
         public async Task GetNextState_ValidBoardId_ReturnsOk()
         {
@@ -90,6 +99,9 @@ namespace GameOfLife.Integration.Tests
             Assert.NotEmpty(response.Data.Board);
         }
 
+        /// <summary>
+        /// Tests that getting the next state of an invalid board ID returns a NotFound status.
+        /// </summary>
         [Fact]
         public async Task GetNextState_InvalidBoardId_ReturnsNotFound()
         {
@@ -101,6 +113,9 @@ namespace GameOfLife.Integration.Tests
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
+        /// <summary>
+        /// Tests that getting the state after a number of steps for a valid board ID returns an OK status and a non-null board state.
+        /// </summary>
         [Fact]
         public async Task GetStateAfterSteps_ValidBoardId_ReturnsOk()
         {
@@ -122,6 +137,9 @@ namespace GameOfLife.Integration.Tests
             Assert.NotEmpty(response.Data.Board);
         }
 
+        /// <summary>
+        /// Tests that getting the state after a number of steps for an invalid board ID returns a NotFound status.
+        /// </summary>
         [Fact]
         public async Task GetStateAfterSteps_InvalidBoardId_ReturnsNotFound()
         {
@@ -133,6 +151,9 @@ namespace GameOfLife.Integration.Tests
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
+        /// <summary>
+        /// Tests that getting the final state of a valid board ID returns an OK status and a non-null board state.
+        /// </summary>
         [Fact]
         public async Task GetFinalState_ValidBoardId_ReturnsOk()
         {
@@ -154,6 +175,9 @@ namespace GameOfLife.Integration.Tests
             Assert.NotEmpty(response.Data.Board);
         }
 
+        /// <summary>
+        /// Tests that getting the final state of an invalid board ID returns a NotFound status.
+        /// </summary>
         [Fact]
         public async Task GetFinalState_InvalidBoardId_ReturnsNotFound()
         {
