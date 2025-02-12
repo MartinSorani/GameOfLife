@@ -151,6 +151,24 @@ namespace GameOfLife.Integration.Tests
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
+        [Fact]
+        public async Task GetStateAfterSteps_NegativeSteps_ReturnsBadRequest()
+        {
+            // Arrange
+            var boardState = CreateSampleBoard();
+            var uploadRequest = new RestRequest("/api/boards", Method.Post)
+                .AddJsonBody(boardState);
+            var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
+            var boardId = uploadResponse.Data;
+
+            // Act: Use negative steps.
+            var request = new RestRequest($"/api/boards/{boardId}/states?steps=-1", Method.Get);
+            var response = await _client.ExecuteAsync(request);
+
+            // Assert: Expect BadRequest.
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
         /// <summary>
         /// Tests that getting the final state of a valid board ID returns an OK status and a non-null board state.
         /// </summary>
@@ -187,6 +205,24 @@ namespace GameOfLife.Integration.Tests
 
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetFinalState_NonPositiveMaxIterations_ReturnsBadRequest()
+        {
+            // Arrange
+            var boardState = CreateSampleBoard();
+            var uploadRequest = new RestRequest("/api/boards", Method.Post)
+                .AddJsonBody(boardState);
+            var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
+            var boardId = uploadResponse.Data;
+
+            // Act: Use 0 for maxIterations.
+            var request = new RestRequest($"/api/boards/{boardId}/final?maxIterations=0", Method.Get);
+            var response = await _client.ExecuteAsync(request);
+
+            // Assert: Expect BadRequest.
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
     }
 }
