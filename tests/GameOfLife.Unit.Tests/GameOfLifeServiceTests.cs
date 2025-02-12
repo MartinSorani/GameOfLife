@@ -44,10 +44,7 @@ namespace GameOfLife.Unit.Tests
             return board;
         }
 
-        // ============================================================
-        // UploadBoard tests
-        // ============================================================
-
+        #region UploadBoard tests
         [Fact]
         public void UploadBoard_NullBoard_ThrowsArgumentNullException()
         {
@@ -74,11 +71,9 @@ namespace GameOfLife.Unit.Tests
             bool[,] retrievedState = service.GetNextState(boardId);
             Assert.NotNull(retrievedState);
         }
+        #endregion
 
-        // ============================================================
-        // GetNextState tests
-        // ============================================================
-
+        #region GetNextState tests
         [Fact]
         public void GetNextState_BoardNotFound_ThrowsArgumentException()
         {
@@ -116,11 +111,9 @@ namespace GameOfLife.Unit.Tests
                 }
             }
         }
+        #endregion
 
-        // ============================================================
-        // GetStateAfterSteps tests
-        // ============================================================
-
+        #region GetStateAfterSteps tests
         [Fact]
         public void GetStateAfterSteps_NegativeSteps_ThrowsArgumentOutOfRangeException()
         {
@@ -175,11 +168,9 @@ namespace GameOfLife.Unit.Tests
                 }
             }
         }
+        #endregion
 
-        // ============================================================
-        // GetFinalState tests
-        // ============================================================
-
+        #region Get Final State Tests
         [Fact]
         public void GetFinalState_MaxIterationsLessThanOrEqualZero_ThrowsArgumentOutOfRangeException()
         {
@@ -238,5 +229,6 @@ namespace GameOfLife.Unit.Tests
             // so we expect an InvalidOperationException.
             Assert.Throws<InvalidOperationException>(() => service.GetFinalState(boardId, 10));
         }
+        #endregion
     }
 }
