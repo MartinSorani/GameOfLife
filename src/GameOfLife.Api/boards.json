@@ -17,9 +17,7 @@
         true,
         false
       ]
-    ],
-    "Rows": 3,
-    "Columns": 3
+    ]
   },
   "966107a4-188b-47d8-8145-e1b740e2c9a2": {
     "Id": "966107a4-188b-47d8-8145-e1b740e2c9a2",
@@ -39,8 +37,86 @@
         true,
         false
       ]
-    ],
-    "Rows": 3,
-    "Columns": 3
+    ]
+  },
+  "602f67dc-4de8-4c27-be37-0dda14659704": {
+    "Id": "602f67dc-4de8-4c27-be37-0dda14659704",
+    "CurrentState": [
+      [
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false
+      ]
+    ]
+  },
+  "6464cf2e-6419-4495-9130-8a948e87dc94": {
+    "Id": "6464cf2e-6419-4495-9130-8a948e87dc94",
+    "CurrentState": [
+      [
+        false,
+        true,
+        false
+      ],
+      [
+        true,
+        false,
+        false
+      ],
+      [
+        false,
+        true,
+        false
+      ]
+    ]
+  },
+  "e88e038c-bb59-4fdd-8919-451692d8e07c": {
+    "Id": "e88e038c-bb59-4fdd-8919-451692d8e07c",
+    "CurrentState": [
+      [
+        false,
+        true,
+        false
+      ],
+      [
+        true,
+        false,
+        false
+      ],
+      [
+        false,
+        true,
+        false
+      ]
+    ]
+  },
+  "ee4ce56d-0727-4122-b5c8-4deeae1281e1": {
+    "Id": "ee4ce56d-0727-4122-b5c8-4deeae1281e1",
+    "CurrentState": [
+      [
+        false,
+        false,
+        false
+      ],
+      [
+        true,
+        true,
+        false
+      ],
+      [
+        false,
+        false,
+        false
+      ]
+    ]
   }
 }

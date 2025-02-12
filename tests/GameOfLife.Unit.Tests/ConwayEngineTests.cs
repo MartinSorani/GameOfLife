@@ -194,7 +194,7 @@ namespace GameOfLife.UnitTests
         public void GetNextGeneration_NullBoard_ThrowsArgumentNullException()
         {
             // Arrange & Act & Assert: Passing a null board should throw an exception.
-            Assert.Throws<ArgumentNullException>(() => ConwayEngine.GetNextGeneration(null));
+            Assert.Throws<ArgumentNullException>(() => ConwayEngine.GetNextGeneration(null!));
         }
 
         [Fact]
@@ -218,7 +218,7 @@ namespace GameOfLife.UnitTests
             expectedBoard[offset + 1, offset + 2] = true;
             expectedBoard[offset + 2, offset + 1] = true;
             expectedBoard[offset + 2, offset + 2] = true;
-            expectedBoard[offset + 3, offset + 1] = true;
+            expectedBoard[offset + 3, offset + 1] = true; // (4,2)
 
             // Act
             bool[,] nextBoard = ConwayEngine.GetNextGeneration(initialBoard);

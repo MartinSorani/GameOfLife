@@ -1,28 +1,34 @@
 using GameOfLife.Api.Services;
 using GameOfLife.Api.Repositories;
 using Serilog;
+using Swashbuckle.AspNetCore.Filters;
+using GameOfLife.Api.Examples;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure logging
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .Enrich.FromLogContext()
-    .WriteTo.File("GameOfLife.Api.Log.txt")
+    .WriteTo.File("./logs/GameOfLife.Logs.txt")
     .CreateLogger();
 
 builder.Host.UseSerilog();
 
-// Configure services (dependency injection)
+// Configure services
 builder.Services.AddControllers();
 
-// Register your custom services and repositories.
-// For example, if you're using an in-memory repository:
-builder.Services.AddSingleton<IInMemoryBoardRepository, InMemoryBoardRepository>();
+// Register services and repositories.
 builder.Services.AddSingleton<IGameOfLifeService, GameOfLifeService>();
+builder.Services.AddSingleton<IBoardRepository, FileBoardRepository>();
 
-// Optional: Add Swagger for API documentation.
+// Add Swagger for API documentation.
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.ExampleFilters();
+});
+builder.Services.AddSwaggerExamplesFromAssemblyOf<BoardDtoExample>();
 
 var app = builder.Build();
 
