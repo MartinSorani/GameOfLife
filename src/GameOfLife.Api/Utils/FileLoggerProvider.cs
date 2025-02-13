@@ -9,7 +9,11 @@ namespace GameOfLife.Api.Utils
 
         public FileLoggerProvider(IConfiguration configuration)
         {
-            _filePath = configuration.GetSection("Logging:File:Path").Value;
+            var logFilePath = configuration.GetSection("Logging:File:Path")?.Value ?? "logs/GameOfLife.Logs.txt";
+            // Create the logs directory in the solution root.
+            var solutionRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
+            _filePath = Path.Combine(solutionRoot, logFilePath);
+            EnsureDirectoryExists(_filePath);
         }
 
         public ILogger CreateLogger(string categoryName)
@@ -20,6 +24,15 @@ namespace GameOfLife.Api.Utils
         public void Dispose()
         {
             _loggers.Clear();
+        }
+
+        private void EnsureDirectoryExists(string filePath)
+        {
+            var directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
         }
     }
 }
