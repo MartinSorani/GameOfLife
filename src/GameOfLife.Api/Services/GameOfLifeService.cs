@@ -10,14 +10,14 @@ namespace GameOfLife.Api.Services
     public class GameOfLifeService : IGameOfLifeService
     {
         private readonly IBoardRepository _boardRepository;
-        private readonly Serilog.ILogger _logger;
+        private readonly ILogger<GameOfLifeService> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GameOfLifeService"/> class.
         /// </summary>
         /// <param name="boardRepository">The repository for managing game boards.</param>
         /// <param name="logger">The logger instance.</param>
-        public GameOfLifeService(IBoardRepository boardRepository, Serilog.ILogger logger)
+        public GameOfLifeService(IBoardRepository boardRepository, ILogger<GameOfLifeService> logger)
         {
             _boardRepository = boardRepository;
             _logger = logger;
@@ -33,13 +33,13 @@ namespace GameOfLife.Api.Services
         {
             if (board == null)
             {
-                _logger.Error("UploadBoard: Board is null");
+                _logger.Log(LogLevel.Error, new EventId(), "UploadBoard: Board is null", null, (state, exception) => state.ToString());
                 throw new ArgumentNullException(nameof(board));
             }
 
             var newBoard = new Board { Id = Guid.NewGuid(), CurrentState = board };
             _boardRepository.AddBoard(newBoard);
-            _logger.Information("UploadBoard: Board uploaded with ID {BoardId}", newBoard.Id);
+            _logger.Log(LogLevel.Information, new EventId(), $"UploadBoard: Board uploaded with ID {newBoard.Id}", null, (state, exception) => state.ToString());
             return newBoard.Id;
         }
 
@@ -58,14 +58,14 @@ namespace GameOfLife.Api.Services
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.Warning(ex, "GetNextState: Board with ID {BoardId} not found", boardId);
+                _logger.Log(LogLevel.Warning, new EventId(), $"GetNextState: Board with ID {boardId} not found", ex, (state, exception) => state.ToString());
                 throw new ArgumentException("Board not found", nameof(boardId));
             }
 
             var nextState = ConwayEngine.GetNextGeneration(board.CurrentState);
             board.CurrentState = nextState;
             _boardRepository.UpdateBoard(board);
-            _logger.Information("GetNextState: Next state computed for board ID {BoardId}", boardId);
+            _logger.Log(LogLevel.Information, new EventId(), $"GetNextState: Next state computed for board ID {boardId}", null, (state, exception) => state.ToString());
             return nextState;
         }
 
@@ -81,7 +81,7 @@ namespace GameOfLife.Api.Services
         {
             if (steps < 0)
             {
-                _logger.Error("GetStateAfterSteps: Steps must be non-negative");
+                _logger.Log(LogLevel.Error, new EventId(), "GetStateAfterSteps: Steps must be non-negative", null, (state, exception) => state.ToString());
                 throw new ArgumentOutOfRangeException(nameof(steps), "Steps must be non-negative");
             }
 
@@ -92,7 +92,7 @@ namespace GameOfLife.Api.Services
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.Warning(ex, "GetStateAfterSteps: Board with ID {BoardId} not found", boardId);
+                _logger.Log(LogLevel.Warning, new EventId(), $"GetStateAfterSteps: Board with ID {boardId} not found", ex, (state, exception) => state.ToString());
                 throw new ArgumentException("Board not found", nameof(boardId));
             }
 
@@ -104,7 +104,7 @@ namespace GameOfLife.Api.Services
 
             board.CurrentState = state;
             _boardRepository.UpdateBoard(board);
-            _logger.Information("GetStateAfterSteps: State after {Steps} steps computed for board ID {BoardId}", steps, boardId);
+            _logger.Log(LogLevel.Information, new EventId(), $"GetStateAfterSteps: State after {steps} steps computed for board ID {boardId}", null, (state, exception) => state.ToString());
             return state;
         }
 
@@ -122,7 +122,7 @@ namespace GameOfLife.Api.Services
         {
             if (maxIterations <= 0)
             {
-                _logger.Error("GetFinalState: Max iterations must be positive");
+                _logger.Log(LogLevel.Error, new EventId(), "GetFinalState: Max iterations must be positive", null, (state, exception) => state.ToString());
                 throw new ArgumentOutOfRangeException(nameof(maxIterations), "Max iterations must be positive");
             }
 
@@ -133,7 +133,7 @@ namespace GameOfLife.Api.Services
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.Warning(ex, "GetFinalState: Board with ID {BoardId} not found", boardId);
+                _logger.Log(LogLevel.Warning, new EventId(), $"GetFinalState: Board with ID {boardId} not found", ex, (state, exception) => state.ToString());
                 throw new ArgumentException("Board not found", nameof(boardId));
             }
 
@@ -147,14 +147,14 @@ namespace GameOfLife.Api.Services
                 {
                     board.CurrentState = nextState;
                     _boardRepository.UpdateBoard(board);
-                    _logger.Information("GetFinalState: Final state reached for board ID {BoardId} after {Iterations} iterations", boardId, iterations);
+                    _logger.Log(LogLevel.Information, new EventId(), $"GetFinalState: Final state reached for board ID {boardId} after {iterations} iterations", null, (state, exception) => state.ToString());
                     return nextState;
                 }
                 currentState = nextState;
                 iterations++;
             }
 
-            _logger.Error("GetFinalState: Final state not reached within {MaxIterations} iterations for board ID {BoardId}", maxIterations, boardId);
+            _logger.Log(LogLevel.Error, new EventId(), $"GetFinalState: Final state not reached within {maxIterations} iterations for board ID {boardId}", null, (state, exception) => state.ToString());
             throw new InvalidOperationException("Final state not reached within maximum iterations");
         }
 

@@ -1,12 +1,12 @@
-﻿using Serilog;
-
-namespace GameOfLife.Api.Utils
+﻿namespace GameOfLife.Api.Utils
 {
     /// <summary>
     /// Provides functionality to compute the next generation in Conway's Game of Life.
     /// </summary>
     public static class ConwayEngine
     {
+        private static readonly FileLogger _logger = new FileLogger("log.txt");
+
         /// <summary>
         /// Computes the next generation of the game board based on the current state.
         /// </summary>
@@ -23,7 +23,7 @@ namespace GameOfLife.Api.Utils
         {
             if (currentState == null)
             {
-                Log.Error("GetNextGeneration called with null currentState");
+                _logger.Log(LogLevel.Error, new EventId(), "GetNextGeneration called with null currentState", new ArgumentNullException(nameof(currentState)), (state, ex) => state.ToString());
                 throw new ArgumentNullException(nameof(currentState));
             }
 
@@ -31,7 +31,7 @@ namespace GameOfLife.Api.Utils
             int cols = currentState.GetLength(1);
             bool[,] nextState = new bool[rows, cols];
 
-            Log.Information("Computing next generation for a board of size {Rows}x{Cols}", rows, cols);
+            _logger.Log(LogLevel.Information, new EventId(), $"Computing next generation for a board of size {rows}x{cols}", null, (state, ex) => state.ToString());
 
             for (int i = 0; i < rows; i++)
             {
@@ -51,7 +51,7 @@ namespace GameOfLife.Api.Utils
                 }
             }
 
-            Log.Information("Next generation computed successfully");
+            _logger.Log(LogLevel.Information, new EventId(), "Next generation computed successfully", null, (state, ex) => state.ToString());
 
             return nextState;
         }

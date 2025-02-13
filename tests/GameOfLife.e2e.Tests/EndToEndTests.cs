@@ -6,22 +6,22 @@ using Microsoft.Extensions.Logging;
 using RestSharp;
 using System.Net;
 
-namespace GameOfLife.Integration.Tests
+namespace GameOfLife.e2e.Tests
 {
-    [Trait("Category", "Integration")]
-    public class ControllerTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
+    [Trait("Category", "E2E")]
+    public class EndToEndTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
     {
         private WebApplicationFactory<Program> _factory;
         private RestClient _client;
         private readonly ILogger _logger;
 
-        public ControllerTests(WebApplicationFactory<Program> factory)
+        public EndToEndTests(WebApplicationFactory<Program> factory)
         {
             // Use the provided factory for the initial tests.
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             var loggerProvider = new FileLoggerProvider(configuration);
-            _logger = loggerProvider.CreateLogger(nameof(ControllerTests));
+            _logger = loggerProvider.CreateLogger(nameof(EndToEndTests));
             InitializeRestClient();
         }
 
@@ -49,48 +49,43 @@ namespace GameOfLife.Integration.Tests
             };
         }
 
-        /// <summary>
-        /// Tests that uploading a valid board returns an OK status and a non-empty GUID.
-        /// </summary>
+        #region UploadBoard Tests
+
         [Fact]
         public async Task UploadBoard_ValidBoard_ReturnsOk()
         {
             // Arrange
             var boardState = CreateSampleBoard();
             var request = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
-            _logger.LogInformation("Uploading a valid board.");
 
             // Act
             var response = await _client.ExecuteAsync<Guid>(request);
 
             // Assert
+            _logger.LogInformation("UploadBoard_ValidBoard_ReturnsOk: StatusCode={StatusCode}, Data={Data}", response.StatusCode, response.Data);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotEqual(Guid.Empty, response.Data);
-            _logger.LogInformation("UploadBoard_ValidBoard_ReturnsOk test passed.");
         }
 
-        /// <summary>
-        /// Tests that uploading a null board returns a BadRequest status.
-        /// </summary>
         [Fact]
-        public async Task UploadBoard_NullBoard_ReturnsBadRequest()
+        public async Task UploadBoard_NullOrEmptyBoard_ReturnsBadRequest()
         {
-            // Arrange
+            // Arrange: Using an empty board array (which should be considered invalid)
             var emptyBoardDto = new BoardStateDto { Board = Array.Empty<bool[]>() };
             var request = new RestRequest("/api/boards", Method.Post).AddJsonBody(emptyBoardDto);
-            _logger.LogInformation("Uploading a null board.");
 
             // Act
             var response = await _client.ExecuteAsync(request);
 
             // Assert
+            _logger.LogInformation("UploadBoard_NullOrEmptyBoard_ReturnsBadRequest: StatusCode={StatusCode}", response.StatusCode);
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            _logger.LogInformation("UploadBoard_NullBoard_ReturnsBadRequest test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the next state of a valid board ID returns an OK status and a non-null board state.
-        /// </summary>
+        #endregion
+
+        #region GetNextState Tests
+
         [Fact]
         public async Task GetNextState_ValidBoardId_ReturnsOk()
         {
@@ -99,39 +94,35 @@ namespace GameOfLife.Integration.Tests
             var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
             var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
-            _logger.LogInformation("Getting the next state for a valid board ID.");
 
             // Act
             var request = new RestRequest($"/api/boards/{boardId}/next", Method.Get);
             var response = await _client.ExecuteAsync<BoardStateDto>(request);
 
             // Assert
+            _logger.LogInformation("GetNextState_ValidBoardId_ReturnsOk: StatusCode={StatusCode}, Data={Data}", response.StatusCode, response.Data);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Data);
             Assert.NotNull(response.Data.Board);
             Assert.NotEmpty(response.Data.Board);
-            _logger.LogInformation("GetNextState_ValidBoardId_ReturnsOk test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the next state of an invalid board ID returns a NotFound status.
-        /// </summary>
         [Fact]
         public async Task GetNextState_InvalidBoardId_ReturnsNotFound()
         {
-            // Act
+            // Arrange & Act
             var request = new RestRequest($"/api/boards/{Guid.NewGuid()}/next", Method.Get);
-            _logger.LogInformation("Getting the next state for an invalid board ID.");
             var response = await _client.ExecuteAsync(request);
 
             // Assert
+            _logger.LogInformation("GetNextState_InvalidBoardId_ReturnsNotFound: StatusCode={StatusCode}", response.StatusCode);
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            _logger.LogInformation("GetNextState_InvalidBoardId_ReturnsNotFound test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the state after a number of steps for a valid board ID returns an OK status and a non-null board state.
-        /// </summary>
+        #endregion
+
+        #region GetStateAfterSteps Tests
+
         [Fact]
         public async Task GetStateAfterSteps_ValidBoardId_ReturnsOk()
         {
@@ -140,39 +131,31 @@ namespace GameOfLife.Integration.Tests
             var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
             var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
-            _logger.LogInformation("Getting the state after steps for a valid board ID.");
 
             // Act
             var request = new RestRequest($"/api/boards/{boardId}/states?steps=1", Method.Get);
             var response = await _client.ExecuteAsync<BoardStateDto>(request);
 
             // Assert
+            _logger.LogInformation("GetStateAfterSteps_ValidBoardId_ReturnsOk: StatusCode={StatusCode}, Data={Data}", response.StatusCode, response.Data);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Data);
             Assert.NotNull(response.Data.Board);
             Assert.NotEmpty(response.Data.Board);
-            _logger.LogInformation("GetStateAfterSteps_ValidBoardId_ReturnsOk test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the state after a number of steps for an invalid board ID returns a NotFound status.
-        /// </summary>
         [Fact]
         public async Task GetStateAfterSteps_InvalidBoardId_ReturnsNotFound()
         {
             // Act
             var request = new RestRequest($"/api/boards/{Guid.NewGuid()}/states?steps=1", Method.Get);
-            _logger.LogInformation("Getting the state after steps for an invalid board ID.");
             var response = await _client.ExecuteAsync(request);
 
             // Assert
+            _logger.LogInformation("GetStateAfterSteps_InvalidBoardId_ReturnsNotFound: StatusCode={StatusCode}", response.StatusCode);
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            _logger.LogInformation("GetStateAfterSteps_InvalidBoardId_ReturnsNotFound test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the state after a number of steps with negative steps returns a BadRequest status.
-        /// </summary>
         [Fact]
         public async Task GetStateAfterSteps_NegativeSteps_ReturnsBadRequest()
         {
@@ -181,20 +164,20 @@ namespace GameOfLife.Integration.Tests
             var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
             var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
-            _logger.LogInformation("Getting the state after negative steps.");
 
-            // Act: Use negative steps.
+            // Act: Negative steps should trigger a BadRequest.
             var request = new RestRequest($"/api/boards/{boardId}/states?steps=-1", Method.Get);
             var response = await _client.ExecuteAsync(request);
 
-            // Assert: Expect BadRequest.
+            // Assert
+            _logger.LogInformation("GetStateAfterSteps_NegativeSteps_ReturnsBadRequest: StatusCode={StatusCode}", response.StatusCode);
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            _logger.LogInformation("GetStateAfterSteps_NegativeSteps_ReturnsBadRequest test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the final state of a valid board ID returns an OK status and a non-null board state.
-        /// </summary>
+        #endregion
+
+        #region GetFinalState Tests
+
         [Fact]
         public async Task GetFinalState_ValidBoardId_ReturnsOk()
         {
@@ -203,58 +186,92 @@ namespace GameOfLife.Integration.Tests
             var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
             var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
-            _logger.LogInformation("Getting the final state for a valid board ID.");
 
             // Act
             var request = new RestRequest($"/api/boards/{boardId}/final?maxIterations=10", Method.Get);
             var response = await _client.ExecuteAsync<BoardStateDto>(request);
 
             // Assert
+            _logger.LogInformation("GetFinalState_ValidBoardId_ReturnsOk: StatusCode={StatusCode}, Data={Data}", response.StatusCode, response.Data);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Data);
             Assert.NotNull(response.Data.Board);
             Assert.NotEmpty(response.Data.Board);
-            _logger.LogInformation("GetFinalState_ValidBoardId_ReturnsOk test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the final state of an invalid board ID returns a NotFound status.
-        /// </summary>
         [Fact]
         public async Task GetFinalState_InvalidBoardId_ReturnsNotFound()
         {
             // Act
             var request = new RestRequest($"/api/boards/{Guid.NewGuid()}/final?maxIterations=10", Method.Get);
-            _logger.LogInformation("Getting the final state for an invalid board ID.");
             var response = await _client.ExecuteAsync(request);
 
             // Assert
+            _logger.LogInformation("GetFinalState_InvalidBoardId_ReturnsNotFound: StatusCode={StatusCode}", response.StatusCode);
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            _logger.LogInformation("GetFinalState_InvalidBoardId_ReturnsNotFound test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the final state with non-positive max iterations returns a BadRequest status.
-        /// </summary>
         [Fact]
         public async Task GetFinalState_NonPositiveMaxIterations_ReturnsBadRequest()
         {
+            _logger.LogInformation("GetFinalState_NonPositiveMaxIterations_ReturnsBadRequest: Starting test...");
             // Arrange
             var boardState = CreateSampleBoard();
             var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
             var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
-            _logger.LogInformation("Getting the final state with non-positive max iterations.");
 
-            // Act: Use 0 for maxIterations.
+            // Act: Using 0 for maxIterations.
             var request = new RestRequest($"/api/boards/{boardId}/final?maxIterations=0", Method.Get);
             var response = await _client.ExecuteAsync(request);
-            _logger.LogDebug(response.Content ?? "Response content is null");
+            _logger.LogDebug(response.Content ?? "No content in response");
 
-            // Assert: Expect BadRequest.
+            // Assert
+            _logger.LogInformation("GetFinalState_NonPositiveMaxIterations_ReturnsBadRequest: StatusCode={StatusCode}", response.StatusCode);
+            Console.WriteLine(response.Content);
+            Console.WriteLine(response.StatusCode);
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-            _logger.LogInformation("GetFinalState_NonPositiveMaxIterations_ReturnsBadRequest test passed.");
         }
+
+        #endregion
+
+        #region Persistence / Crash Recovery Tests
+
+        /// <summary>
+        /// Simulates a service restart (crash recovery) by re-creating the WebApplicationFactory,
+        /// and verifies that an uploaded board persists between restarts.
+        /// </summary>
+        [Fact]
+        public async Task DataPersistence_AfterServiceRestart_BoardStateIsPersisted()
+        {
+            // Arrange: Upload a board using the current factory.
+            var boardState = CreateSampleBoard();
+            var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
+            var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
+            var boardId = uploadResponse.Data;
+            Assert.NotEqual(Guid.Empty, boardId);
+
+            // Simulate a service restart by disposing the current factory and creating a new one.
+            _factory.Dispose();
+
+            // Create a new factory instance.
+            using var newFactory = new WebApplicationFactory<Program>();
+            var httpClient = newFactory.CreateClient();
+            var newClient = new RestClient(httpClient);
+
+            // Act: Retrieve the next state using the new client (which should reflect persisted data).
+            var request = new RestRequest($"/api/boards/{boardId}/next", Method.Get);
+            var response = await newClient.ExecuteAsync<BoardStateDto>(request);
+
+            // Assert: The board state should persist across restarts.
+            _logger.LogInformation("DataPersistence_AfterServiceRestart_BoardStateIsPersisted: StatusCode={StatusCode}, Data={Data}", response.StatusCode, response.Data);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Data);
+            Assert.NotNull(response.Data.Board);
+            Assert.NotEmpty(response.Data.Board);
+        }
+
+        #endregion
 
         // Clean up test data
         public void Dispose()
@@ -269,7 +286,7 @@ namespace GameOfLife.Integration.Tests
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error during cleanup in Dispose method: {ExceptionMessage}", ex.Message);
+                _logger.LogError("Error during cleanup in Dispose method.", ex);
             }
         }
     }

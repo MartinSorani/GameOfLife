@@ -1,9 +1,9 @@
-﻿using Serilog;
-
-namespace GameOfLife.Api.Utils
+﻿namespace GameOfLife.Api.Utils
 {
     public static class ArrayConverter
     {
+        private static readonly FileLogger _logger = new("log.txt");
+
         /// <summary>
         /// Converts a jagged bool array to a 2D bool array.
         /// Throws an exception if the jagged array is irregular.
@@ -14,7 +14,7 @@ namespace GameOfLife.Api.Utils
         {
             if (jaggedArray.Length == 0)
             {
-                Log.Warning("The provided jagged array is empty.");
+                _logger.Log(LogLevel.Warning, new EventId(), "The provided jagged array is empty.", null, (state, ex) => state.ToString());
                 return new bool[0, 0];
             }
 
@@ -26,7 +26,7 @@ namespace GameOfLife.Api.Utils
             {
                 if (jaggedArray[i].Length != cols)
                 {
-                    Log.Error("Jagged array is irregular at row {Row}.", i);
+                    _logger.Log(LogLevel.Error, new EventId(), $"Jagged array is irregular at row {i}.", null, (state, ex) => state.ToString());
                     throw new ArgumentException("All rows must have the same number of columns.");
                 }
                 for (int j = 0; j < cols; j++)
@@ -35,7 +35,7 @@ namespace GameOfLife.Api.Utils
                 }
             }
 
-            Log.Information("Successfully converted jagged array to 2D array.");
+            _logger.Log(LogLevel.Information, new EventId(), "Successfully converted jagged array to 2D array.", null, (state, ex) => state.ToString());
             return result;
         }
 
@@ -57,7 +57,7 @@ namespace GameOfLife.Api.Utils
                 }
             }
 
-            Log.Information("Successfully converted 2D array to jagged array.");
+            _logger.Log(LogLevel.Information, new EventId(), "Successfully converted 2D array to jagged array.", null, (state, ex) => state.ToString());
             return jagged;
         }
     }

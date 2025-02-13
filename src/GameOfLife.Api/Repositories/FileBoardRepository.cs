@@ -1,6 +1,6 @@
 ﻿using GameOfLife.Api.Models;
+using GameOfLife.Api.Utils;
 using Newtonsoft.Json;
-using Serilog;
 
 namespace GameOfLife.Api.Repositories
 {
@@ -9,22 +9,24 @@ namespace GameOfLife.Api.Repositories
         private readonly string _filePath;
         private Dictionary<Guid, Board> _boards;
         private readonly object _lock = new();
+        private readonly ILogger _logger;
 
-        public FileBoardRepository(string filePath = "boards.json")
+        public FileBoardRepository(string filePath = "boards.json", ILogger logger = null)
         {
             _filePath = filePath;
+            _logger = logger ?? new FileLogger("log.txt");
             if (File.Exists(_filePath))
             {
                 // Read and deserialize existing boards from file.
                 string json = File.ReadAllText(_filePath);
                 _boards = JsonConvert.DeserializeObject<Dictionary<Guid, Board>>(json)
                           ?? new Dictionary<Guid, Board>();
-                Log.Information("Loaded boards from {FilePath}", _filePath);
+                _logger.Log(LogLevel.Information, new EventId(), $"Loaded boards from {_filePath}", null, (state, ex) => state.ToString());
             }
             else
             {
                 _boards = new Dictionary<Guid, Board>();
-                Log.Information("No existing boards found, starting with an empty collection.");
+                _logger.Log(LogLevel.Information, new EventId(), "No existing boards found, starting with an empty collection.", null, (state, ex) => state.ToString());
             }
         }
 
@@ -34,7 +36,7 @@ namespace GameOfLife.Api.Repositories
             {
                 _boards[board.Id] = board;
                 Save();
-                Log.Information("Added board with ID {BoardId}", board.Id);
+                _logger.Log(LogLevel.Information, new EventId(), $"Added board with ID {board.Id}", null, (state, ex) => state.ToString());
             }
         }
 
@@ -44,12 +46,12 @@ namespace GameOfLife.Api.Repositories
             {
                 if (_boards.TryGetValue(boardId, out var board))
                 {
-                    Log.Information("Retrieved board with ID {BoardId}", boardId);
+                    _logger.Log(LogLevel.Information, new EventId(), $"Retrieved board with ID {boardId}", null, (state, ex) => state.ToString());
                     return board;
                 }
                 else
                 {
-                    Log.Warning("Board with ID {BoardId} not found", boardId);
+                    _logger.Log(LogLevel.Warning, new EventId(), $"Board with ID {boardId} not found", null, (state, ex) => state.ToString());
                     throw new KeyNotFoundException($"Board with ID {boardId} not found.");
                 }
             }
@@ -61,7 +63,7 @@ namespace GameOfLife.Api.Repositories
             {
                 _boards[board.Id] = board;
                 Save();
-                Log.Information("Updated board with ID {BoardId}", board.Id);
+                _logger.Log(LogLevel.Information, new EventId(), $"Updated board with ID {board.Id}", null, (state, ex) => state.ToString());
             }
         }
 
@@ -70,7 +72,7 @@ namespace GameOfLife.Api.Repositories
             // Serialize the dictionary and write it to the file.
             string json = JsonConvert.SerializeObject(_boards, Formatting.Indented);
             File.WriteAllText(_filePath, json);
-            Log.Information("Saved boards to {FilePath}", _filePath);
+            _logger.Log(LogLevel.Information, new EventId(), $"Saved boards to {_filePath}", null, (state, ex) => state.ToString());
         }
     }
 }

@@ -402,3 +402,6 @@ FodyWeavers.xsd
 # Log file
 *.log
 *.txt
+
+# Board data
+**/boards.json

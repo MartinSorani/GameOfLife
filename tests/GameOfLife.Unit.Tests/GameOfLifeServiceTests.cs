@@ -1,6 +1,6 @@
 ﻿using GameOfLife.Api.Repositories;
 using GameOfLife.Api.Services;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace GameOfLife.Unit.Tests
@@ -14,7 +14,7 @@ namespace GameOfLife.Unit.Tests
         private IGameOfLifeService CreateService()
         {
             IBoardRepository repository = new InMemoryBoardRepository();
-            var mockLogger = new Mock<ILogger>();
+            var mockLogger = new Mock<ILogger<GameOfLifeService>>();
             return new GameOfLifeService(repository, mockLogger.Object);
         }
 
