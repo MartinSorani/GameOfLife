@@ -3,6 +3,7 @@ using GameOfLife.Api.Utils;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RestSharp;
 using System.Net;
 
@@ -181,11 +182,13 @@ namespace GameOfLife.e2e.Tests
         [Fact]
         public async Task GetFinalState_ValidBoardId_ReturnsOk()
         {
+            _logger.LogDebug("GetFinalState_ValidBoardId_ReturnsOk: Starting test...");
             // Arrange
             var boardState = CreateSampleBoard();
             var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
             var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
+            _logger.LogDebug("Created board with id " + boardId);
 
             // Act
             var request = new RestRequest($"/api/boards/{boardId}/final?maxIterations=10", Method.Get);
@@ -214,22 +217,28 @@ namespace GameOfLife.e2e.Tests
         [Fact]
         public async Task GetFinalState_NonPositiveMaxIterations_ReturnsBadRequest()
         {
-            _logger.LogInformation("GetFinalState_NonPositiveMaxIterations_ReturnsBadRequest: Starting test...");
-            // Arrange
+            // Use the custom factory so that this test uses its own persistent file.
+            using var factory = new CustomWebApplicationFactory();
+            var httpClient = factory.CreateClient();
+            var client = new RestClient(httpClient);
+
+            // Arrange: Upload a valid board.
             var boardState = CreateSampleBoard();
             var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
-            var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
+            var uploadResponse = await client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
+            Assert.NotEqual(Guid.Empty, boardId);
 
-            // Act: Using 0 for maxIterations.
-            var request = new RestRequest($"/api/boards/{boardId}/final?maxIterations=0", Method.Get);
-            var response = await _client.ExecuteAsync(request);
-            _logger.LogDebug(response.Content ?? "No content in response");
+            // Act: Using 0 for maxIterations should trigger a BadRequest.
+            var request = new RestRequest($"/api/boards/{boardId}/final", Method.Get);
+            request.AddQueryParameter("maxIterations", "0");
+            var response = await client.ExecuteAsync(request);
 
-            // Assert
-            _logger.LogInformation("GetFinalState_NonPositiveMaxIterations_ReturnsBadRequest: StatusCode={StatusCode}", response.StatusCode);
-            Console.WriteLine(response.Content);
-            Console.WriteLine(response.StatusCode);
+            // For debugging:
+            Console.WriteLine("Response Content: " + response.Content);
+            Console.WriteLine("Status Code: " + response.StatusCode);
+
+            // Assert: Expect BadRequest.
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
