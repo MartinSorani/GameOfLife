@@ -11,10 +11,10 @@ namespace GameOfLife.Api.Repositories
         private readonly object _lock = new();
         private readonly ILogger _logger;
 
-        public FileBoardRepository(string filePath = "boards.json", ILogger logger = null)
+        public FileBoardRepository(string filePath = "boards.json", ILogger? logger = null)
         {
             _filePath = filePath;
-            _logger = logger ?? new FileLogger("log.txt");
+            _logger = logger ?? new FileLogger("FileBoardRepository", "log.txt");
             if (File.Exists(_filePath))
             {
                 // Read and deserialize existing boards from file.

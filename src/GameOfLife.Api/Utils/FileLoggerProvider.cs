@@ -18,7 +18,7 @@ namespace GameOfLife.Api.Utils
 
         public ILogger CreateLogger(string categoryName)
         {
-            return _loggers.GetOrAdd(categoryName, name => new FileLogger(_filePath));
+            return _loggers.GetOrAdd(categoryName, name => new FileLogger(_filePath, categoryName));
         }
 
         public void Dispose()

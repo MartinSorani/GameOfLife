@@ -2,7 +2,7 @@
 {
     public static class ArrayConverter
     {
-        private static readonly FileLogger _logger = new("log.txt");
+        private static readonly FileLogger _logger = new("log.txt", "ArrayConverter");
 
         /// <summary>
         /// Converts a jagged bool array to a 2D bool array.

@@ -3,16 +3,21 @@
     public class FileLogger : ILogger
     {
         private readonly string _filePath;
+        private readonly string _categoryName;
         private static readonly object _lock = new object();
 
-        public FileLogger(string filePath)
+        public FileLogger(string filePath, string categoryName)
         {
             _filePath = filePath;
+            _categoryName = categoryName;
 
-            // Ensure the file is overwritten when the logger is initialized.
+            // Ensure the file is created if it doesn't exist, but do not overwrite it.
             lock (_lock)
             {
-                File.WriteAllText(_filePath, string.Empty);
+                if (!File.Exists(_filePath))
+                {
+                    File.WriteAllText(_filePath, string.Empty);
+                }
             }
         }
 
@@ -33,7 +38,7 @@
                 return;
             }
 
-            var logRecord = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{logLevel}] {message} {exception?.StackTrace}";
+            var logRecord = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{logLevel}] {_categoryName}: {message} {exception?.StackTrace}";
             lock (_lock)
             {
                 File.AppendAllText(_filePath, logRecord + Environment.NewLine);

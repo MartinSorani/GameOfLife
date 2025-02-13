@@ -11,7 +11,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         // Generate a unique temporary file path.
         TempFilePath = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.json");
 
-        var inMemorySettings = new Dictionary<string, string>
+        var inMemorySettings = new Dictionary<string, string?>
         {
             // Assuming your repository uses this configuration key.
             { "FileBoardRepository:FilePath", TempFilePath }

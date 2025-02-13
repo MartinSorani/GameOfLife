@@ -12,7 +12,7 @@ namespace GameOfLife.Integration.Tests
     public class ControllerTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
     {
         private WebApplicationFactory<Program> _factory;
-        private RestClient _client;
+        public required RestClient _client;
         private readonly ILogger _logger;
 
         public ControllerTests(WebApplicationFactory<Program> factory)

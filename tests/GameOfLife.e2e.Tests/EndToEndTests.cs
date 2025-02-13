@@ -3,7 +3,6 @@ using GameOfLife.Api.Utils;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using RestSharp;
 using System.Net;
 
@@ -13,7 +12,7 @@ namespace GameOfLife.e2e.Tests
     public class EndToEndTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
     {
         private WebApplicationFactory<Program> _factory;
-        private RestClient _client;
+        public required RestClient _client;
         private readonly ILogger _logger;
 
         public EndToEndTests(WebApplicationFactory<Program> factory)
@@ -295,7 +294,7 @@ namespace GameOfLife.e2e.Tests
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error during cleanup in Dispose method.", ex);
+                _logger.LogError(ex, "Error during cleanup in Dispose method.");
             }
         }
     }

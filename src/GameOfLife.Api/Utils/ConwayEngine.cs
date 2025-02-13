@@ -5,7 +5,7 @@
     /// </summary>
     public static class ConwayEngine
     {
-        private static readonly FileLogger _logger = new FileLogger("log.txt");
+        private static readonly FileLogger _logger = new FileLogger("log.txt", "ConwayEngine");
 
         /// <summary>
         /// Computes the next generation of the game board based on the current state.
