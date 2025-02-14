@@ -13,7 +13,6 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         var inMemorySettings = new Dictionary<string, string?>
         {
-            // Assuming your repository uses this configuration key.
             { "FileBoardRepository:FilePath", TempFilePath }
         };
 

@@ -1,0 +1,13 @@
+{
+  "allure": {
+    "directory": "allure-results",
+    "title": "GameOfLife API E2E Test Report",
+    "links": [
+      "https://github.com/yourusername/GameOfLife/issues/{issue}",
+      "https://yourtms.com/{tms}"
+    ],
+    "failExceptions": [
+      "System.Exception"
+    ]
+  }
+}

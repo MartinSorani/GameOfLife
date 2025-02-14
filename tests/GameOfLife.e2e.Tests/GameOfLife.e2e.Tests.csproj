@@ -22,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+	<None Update="allureConfig.json">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
     <ProjectReference Include="..\..\src\GameOfLife.Api\GameOfLife.Api.csproj" />
   </ItemGroup>
 
