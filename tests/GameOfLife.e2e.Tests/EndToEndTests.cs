@@ -190,7 +190,7 @@ namespace GameOfLife.e2e.Tests
         public async Task GetNextState_ValidBoardId_ReturnsOk()
         {
             // Arrange
-            var boardId = await CreateNewBoard();
+            var boardId = CreateNewBoard();
 
             // Act
             var response = await AllureApi.Step(
@@ -297,10 +297,7 @@ namespace GameOfLife.e2e.Tests
                 "Get state after steps",
                 async () =>
                 {
-                    var request = new RestRequest(
-                        $"/api/boards/{boardId}/states?steps=1",
-                        Method.Get
-                    );
+                    var request = new RestRequest($"/api/boards/{boardId}/states?steps=1", Method.Get);
                     return await _client.ExecuteAsync<BoardStateDto>(request);
                 }
             );
@@ -338,10 +335,6 @@ namespace GameOfLife.e2e.Tests
             );
         }
 
-        [AllureDescription(
-            "Verify that getting the state after a specified number of steps with an invalid board ID returns NotFound."
-        )]
-        [AllureFeature("/states")]
         [Fact]
         public async Task GetStateAfterSteps_InvalidBoardId_ReturnsNotFound()
         {
@@ -394,10 +387,6 @@ namespace GameOfLife.e2e.Tests
             );
         }
 
-        [AllureDescription(
-            "Verify that getting the state after a specified number of steps with negative steps returns BadRequest."
-        )]
-        [AllureFeature("/states")]
         [Fact]
         public async Task GetStateAfterSteps_NegativeSteps_ReturnsBadRequest()
         {
@@ -429,123 +418,54 @@ namespace GameOfLife.e2e.Tests
 
         #region GetFinalState Tests
 
-        [AllureDescription("Verify that getting the final state of a valid board returns OK.")]
-        [AllureFeature("/final")]
         [Fact]
         public async Task GetFinalState_ValidBoardId_ReturnsOk()
         {
+            _logger.LogDebug("GetFinalState_ValidBoardId_ReturnsOk: Starting test...");
             // Arrange
-            var boardId = await CreateNewBoard();
+            var boardState = CreateSampleBoard();
+            var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
+            var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
+            var boardId = uploadResponse.Data;
+            _logger.LogDebug("Created board with id " + boardId);
 
             // Act
-            var response = await AllureApi.Step(
-                "Get final state",
-                async () =>
-                {
-                    var request = new RestRequest(
-                        $"/api/boards/{boardId}/final?maxIterations=10",
-                        Method.Get
-                    );
-                    return await _client.ExecuteAsync<BoardStateDto>(request);
-                }
+            var request = new RestRequest(
+                $"/api/boards/{boardId}/final?maxIterations=10",
+                Method.Get
             );
+            var response = await _client.ExecuteAsync<BoardStateDto>(request);
 
             // Assert
-            await AllureApi.Step(
-                "Validate response status",
-                async () =>
-                {
-                    _logger.LogInformation(
-                        "GetFinalState_ValidBoardId_ReturnsOk: StatusCode={StatusCode}, Data={Data}",
-                        response.StatusCode,
-                        response.Data
-                    );
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    Assert.NotNull(response.Data);
-                    Assert.NotNull(response.Data.Board);
-                    Assert.NotEmpty(response.Data.Board);
-                    AllureLifecycle.Instance.UpdateStep(step =>
-                    {
-                        step.parameters.Add(
-                            new Parameter
-                            {
-                                name = "Response Status",
-                                value = response.StatusCode.ToString(),
-                            }
-                        );
-                        var boardJson = JsonConvert.SerializeObject(response.Data.Board);
-                        step.parameters.Add(
-                            new Parameter { name = "Board Data", value = boardJson }
-                        );
-                        step.parameters.Add(
-                            new Parameter { name = "Board Data", value = response.Data.ToString() }
-                        );
-                    });
-                    await Task.CompletedTask;
-                }
+            _logger.LogInformation(
+                "GetFinalState_ValidBoardId_ReturnsOk: StatusCode={StatusCode}, Data={Data}",
+                response.StatusCode,
+                response.Data
             );
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Data);
+            Assert.NotNull(response.Data.Board);
+            Assert.NotEmpty(response.Data.Board);
         }
 
-        [AllureDescription(
-            "Verify that getting the final state of an invalid board returns NotFound."
-        )]
-        [AllureFeature("/final")]
         [Fact]
         public async Task GetFinalState_InvalidBoardId_ReturnsNotFound()
         {
             // Act
-            var invalidBoardId = Guid.NewGuid();
-            var response = await AllureApi.Step(
-                "Get final state using invalid board id",
-                async () =>
-                {
-                    var request = new RestRequest(
-                        $"/api/boards/{invalidBoardId}/final?maxIterations=10",
-                        Method.Get
-                    );
-                    AllureLifecycle.Instance.UpdateStep(step =>
-                    {
-                        step.parameters.Add(
-                            new Parameter
-                            {
-                                name = "Invalid BoardId",
-                                value = invalidBoardId.ToString(),
-                            }
-                        );
-                    });
-                    return await _client.ExecuteAsync(request);
-                }
+            var request = new RestRequest(
+                $"/api/boards/{Guid.NewGuid()}/final?maxIterations=10",
+                Method.Get
             );
+            var response = await _client.ExecuteAsync(request);
 
             // Assert
-            await AllureApi.Step(
-                "Validate response status",
-                async () =>
-                {
-                    _logger.LogInformation(
-                        "GetFinalState_InvalidBoardId_ReturnsNotFound: StatusCode={StatusCode}",
-                        response.StatusCode
-                    );
-                    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-                    AllureLifecycle.Instance.UpdateStep(step =>
-                    {
-                        step.parameters.Add(
-                            new Parameter
-                            {
-                                name = "Response Status",
-                                value = response.StatusCode.ToString(),
-                            }
-                        );
-                    });
-                    await Task.CompletedTask;
-                }
+            _logger.LogInformation(
+                "GetFinalState_InvalidBoardId_ReturnsNotFound: StatusCode={StatusCode}",
+                response.StatusCode
             );
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        [AllureDescription(
-            "Verify that getting the final state of a valid board with non-positive maxIterations returns BadRequest."
-        )]
-        [AllureFeature("/final")]
         [Fact]
         public async Task GetFinalState_NonPositiveMaxIterations_ReturnsBadRequest()
         {
@@ -586,69 +506,34 @@ namespace GameOfLife.e2e.Tests
         public async Task DataPersistence_AfterServiceRestart_BoardStateIsPersisted()
         {
             // Arrange: Upload a board using the current factory.
-            AllureApi.Step("Creating new sample board");
             var boardState = CreateSampleBoard();
-            AllureApi.Step("Creating new request to /api/boards");
             var uploadRequest = new RestRequest("/api/boards", Method.Post).AddJsonBody(boardState);
             var uploadResponse = await _client.ExecuteAsync<Guid>(uploadRequest);
             var boardId = uploadResponse.Data;
-            AllureApi.Step($"Validating uploaded board {boardId}");
             Assert.NotEqual(Guid.Empty, boardId);
 
-            AllureApi.Step(
-                "Simulate a service restart by disposing the current factory and creating a new one."
-            );
+            // Simulate a service restart by disposing the current factory and creating a new one.
             _factory.Dispose();
 
-            AllureApi.Step("Create a new factory instance.");
+            // Create a new factory instance.
             using var newFactory = new WebApplicationFactory<Program>();
             var httpClient = newFactory.CreateClient();
             var newClient = new RestClient(httpClient);
 
             // Act: Retrieve the next state using the new client (which should reflect persisted data).
-            var response = await AllureApi.Step(
-                "Get next state",
-                async () =>
-                {
-                    var request = new RestRequest($"/api/boards/{boardId}/next", Method.Get);
-                    return await newClient.ExecuteAsync<BoardStateDto>(request);
-                }
-            );
+            var request = new RestRequest($"/api/boards/{boardId}/next", Method.Get);
+            var response = await newClient.ExecuteAsync<BoardStateDto>(request);
 
             // Assert: The board state should persist across restarts.
-            await AllureApi.Step(
-                "Validate response status",
-                async () =>
-                {
-                    _logger.LogInformation(
-                        "DataPersistence_AfterServiceRestart_BoardStateIsPersisted: StatusCode={StatusCode}, Data={Data}",
-                        response.StatusCode,
-                        response.Data
-                    );
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                    Assert.NotNull(response.Data);
-                    Assert.NotNull(response.Data.Board);
-                    Assert.NotEmpty(response.Data.Board);
-                    AllureLifecycle.Instance.UpdateStep(step =>
-                    {
-                        step.parameters.Add(
-                            new Parameter
-                            {
-                                name = "Response Status",
-                                value = response.StatusCode.ToString(),
-                            }
-                        );
-                        var boardJson = JsonConvert.SerializeObject(response.Data.Board);
-                        step.parameters.Add(
-                            new Parameter { name = "Board Data", value = boardJson }
-                        );
-                        step.parameters.Add(
-                            new Parameter { name = "Board ID", value = response.Data.ToString() }
-                        );
-                    });
-                    await Task.CompletedTask;
-                }
+            _logger.LogInformation(
+                "DataPersistence_AfterServiceRestart_BoardStateIsPersisted: StatusCode={StatusCode}, Data={Data}",
+                response.StatusCode,
+                response.Data
             );
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Data);
+            Assert.NotNull(response.Data.Board);
+            Assert.NotEmpty(response.Data.Board);
         }
 
         #endregion

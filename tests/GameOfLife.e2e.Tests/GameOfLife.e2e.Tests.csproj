@@ -10,7 +10,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<None Update="..\..\allureConfig.json">
+		<None Update="..\..\src\GameOfLife.Api\allureConfig.json">
 			<Link>allureConfig.json</Link>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

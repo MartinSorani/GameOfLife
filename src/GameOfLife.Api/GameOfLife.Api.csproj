@@ -10,12 +10,7 @@
 
   <ItemGroup>
     <Content Remove="allureConfig.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="allureConfig.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Content Remove="appsettings.Development.json" />
   </ItemGroup>
 
   <ItemGroup>
