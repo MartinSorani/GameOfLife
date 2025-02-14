@@ -6,6 +6,7 @@ A production-ready API implementation for [Conway’s Game of Life](https://en.w
 
 ## Table of Contents
 
+- [Rules of the Game](#rules-of-the-game)]
 - [Features](#features)
 - [Requirements](#requirements)
 - [Project Structure](#project-structure)
@@ -25,6 +26,17 @@ A production-ready API implementation for [Conway’s Game of Life](https://en.w
 - [License](#license)
 
 ---
+
+## Rules of the Game
+
+Conway's Game of Life is a cellular automaton devised by mathematician John Conway. The game is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input. The game is played on an infinite two-dimensional grid of cells, each of which can be alive or dead. The game progresses in generations, with each cell's state in the next generation determined by the following rules:
+
+1. **Underpopulation:** Any live cell with fewer than two live neighbors dies.
+1. **Survival:** Any live cell with two or three live neighbors survives.
+1. **Overpopulation:** Any live cell with more than three live neighbors dies.
+1. **Reproduction:** Any dead cell with exactly three live neighbors becomes a live cell.
+1. **Stable State:** A cell with no live neighbors or two live neighbors remains in the same state.
+
 
 ## Features
 
@@ -53,49 +65,49 @@ A production-ready API implementation for [Conway’s Game of Life](https://en.w
 
 ## Project Structure
 
-📦GameOfLife
- ┣ 📂src
- ┃ ┗ 📂GameOfLife.Api
- ┃ ┃ ┣ 📂Controllers
- ┃ ┃ ┃ ┗ 📜BoardsController.cs
- ┃ ┃ ┣ 📂Examples
- ┃ ┃ ┃ ┗ 📜BoardDtoExample.cs
- ┃ ┃ ┣ 📂Models
- ┃ ┃ ┃ ┣ 📜Board.cs
- ┃ ┃ ┃ ┗ 📜BoardStateDto.cs
- ┃ ┃ ┣ 📂Properties
- ┃ ┃ ┃ ┗ 📜launchSettings.json
- ┃ ┃ ┣ 📂Repositories
- ┃ ┃ ┃ ┣ 📜FileBoardRepository.cs
- ┃ ┃ ┃ ┣ 📜IBoardRepository.cs
- ┃ ┃ ┃ ┗ 📜InMemoryBoardRepository.cs
- ┃ ┃ ┣ 📂Services
- ┃ ┃ ┃ ┣ 📜GameOfLifeService.cs
- ┃ ┃ ┃ ┗ 📜IGameOfLifeService.cs
- ┃ ┃ ┣ 📂Utils
- ┃ ┃ ┃ ┣ 📜ArrayConverter.cs
- ┃ ┃ ┃ ┣ 📜ConwayEngine.cs
- ┃ ┃ ┃ ┣ 📜FileLogger.cs
- ┃ ┃ ┃ ┗ 📜FileLoggerProvider.cs
- ┃ ┃ ┣ 📜appsettings.json
- ┃ ┃ ┣ 📜Dockerfile
- ┃ ┃ ┗ 📜Program.cs
- ┣ 📂tests
- ┃ ┣ 📂GameOfLife.e2e.Tests
- ┃ ┃ ┣ 📂Factories
- ┃ ┃ ┃ ┗ 📜CustomWebApplicationFactory.cs
- ┃ ┃ ┗ 📜EndToEndTests.cs
- ┃ ┣ 📂GameOfLife.Integration.Tests
- ┃ ┃ ┗ 📜ControllerTests.cs
- ┃ ┣ 📂GameOfLife.Unit.Tests
- ┃ ┃ ┣ 📜ConwayEngineTests.cs
- ┃ ┃ ┗ 📜GameOfLifeServiceTests.cs
- ┣ 📜.dockerignore
- ┣ 📜.gitignore
- ┣ 📜allureConfig.json
- ┣ 📜GameOfLife.sln
- ┣ 📜nuget.config
- ┗ 📜README.md
+📦GameOfLife\
+ ┣ 📂src\
+ ┃ ┗ 📂GameOfLife.Api\
+ ┃ ┃ ┣ 📂Controllers\
+ ┃ ┃ ┃ ┗ 📜BoardsController.cs\
+ ┃ ┃ ┣ 📂Examples\
+ ┃ ┃ ┃ ┗ 📜BoardDtoExample.cs\
+ ┃ ┃ ┣ 📂Models\
+ ┃ ┃ ┃ ┣ 📜Board.cs\
+ ┃ ┃ ┃ ┗ 📜BoardStateDto.cs\
+ ┃ ┃ ┣ 📂Properties\
+ ┃ ┃ ┃ ┗ 📜launchSettings.json\
+ ┃ ┃ ┣ 📂Repositories\
+ ┃ ┃ ┃ ┣ 📜FileBoardRepository.cs\
+ ┃ ┃ ┃ ┣ 📜IBoardRepository.cs\
+ ┃ ┃ ┃ ┗ 📜InMemoryBoardRepository.cs\
+ ┃ ┃ ┣ 📂Services\
+ ┃ ┃ ┃ ┣ 📜GameOfLifeService.cs\
+ ┃ ┃ ┃ ┗ 📜IGameOfLifeService.cs\
+ ┃ ┃ ┣ 📂Utils\
+ ┃ ┃ ┃ ┣ 📜ArrayConverter.cs\
+ ┃ ┃ ┃ ┣ 📜ConwayEngine.cs\
+ ┃ ┃ ┃ ┣ 📜FileLogger.cs\
+ ┃ ┃ ┃ ┗ 📜FileLoggerProvider.cs\
+ ┃ ┃ ┣ 📜appsettings.json\
+ ┃ ┃ ┣ 📜Dockerfile\
+ ┃ ┃ ┗ 📜Program.cs\
+ ┣ 📂tests\
+ ┃ ┣ 📂GameOfLife.e2e.Tests\
+ ┃ ┃ ┣ 📂Factories\
+ ┃ ┃ ┃ ┗ 📜CustomWebApplicationFactory.cs\
+ ┃ ┃ ┗ 📜EndToEndTests.cs\
+ ┃ ┣ 📂GameOfLife.Integration.Tests\
+ ┃ ┃ ┗ 📜ControllerTests.cs\
+ ┃ ┣ 📂GameOfLife.Unit.Tests\
+ ┃ ┃ ┣ 📜ConwayEngineTests.cs\
+ ┃ ┃ ┗ 📜GameOfLifeServiceTests.cs\
+ ┣ 📜.dockerignore\
+ ┣ 📜.gitignore\
+ ┣ 📜allureConfig.json\
+ ┣ 📜GameOfLife.sln\
+ ┣ 📜nuget.config\
+ ┗ 📜README.md\
  
 ---
 
@@ -129,37 +141,43 @@ A production-ready API implementation for [Conway’s Game of Life](https://en.w
    ```bash
    git clone https://github.com/MartinSorani/GameOfLife.git
    cd GameOfLife
+    ```
 
-   2. **Restore and build:**
+1. **Restore and build:**
    ```bash
-dotnet restore
-dotnet build
+    dotnet restore
+    dotnet build
+    ```
 
-3. **Run the API:**
-   ```bash
-   dotnet run --project src/GameOfLife.Api
+1. **Run the API:**
+    ```bash
+    dotnet run --project src/GameOfLife.Api
+    ```
 
-   4. **Access the API:**
-The API should be available at the URLs specified in launchSettings.json (e.g., http://localhost:5042, https://localhost:7042).
+1. **Access the API:**
+
+    The API should be available at the URLs specified in launchSettings.json (e.g., http://localhost:5042, https://localhost:7042).
 
 ### Docker
 
 1. **Build the Docker image:**
    ```bash
    docker build -t gameoflife-api -f src/GameOfLife.Api/Dockerfile .
+   ```
 
-2. **Run the Docker container:**
-   ```bash
-   docker run -d -p 5042:80 -p 7042:443 gameoflife-api
+1. **Run the Docker container:**
+    ```bash
+    docker run -d -p 5042:80 -p 7042:443 gameoflife-api
+    ```
 
-3. **Access the API:**            
-Open your browser to http://localhost:5042, https://localhost:7042.
+1. **Access the API:**            
+Open your browser to [http://localhost:5042](http://localhost:5042) or [https://localhost:7042](https://localhost:7042).
 
 ---
 
 ## API Endpoints
 
-- **POST /api/boards/upload:** Upload a new board state and receive a unique identifier (GUID).
+- **POST /api/boards:** Upload a new board state and receive a unique identifier (GUID).
 
   Request Body:
   ```json
@@ -177,14 +195,27 @@ Open your browser to http://localhost:5042, https://localhost:7042.
     "id": "d7b3b3b3-0b3b-4b3b-8b3b-0b3b3b3b3b3b"
   }
   ```
-- **GET /api/boards/{id}/next:** Compute and retrieve the next generation of the board.
-- **GET /api/boards/{id}/states?steps={steps}:** Retrieve the board state after a specified number of generations.
-- **GET /api/boards/{id}/final?maxIterations={maxIterations}:** Retrieves the final (stable) board state.
+- **GET /api/boards/{id}/next:** Compute and retrieve the next generation of the board.\
+
+  Returns:
+  * 404 Not Found if the board is not found.
+  * 400 Bad Request on invalid board id.
+  * 200 OK on successful computation.
+  
+- **GET /api/boards/{id}/states?steps={steps}:** Retrieve the board state after a specified number of generations.\
+
+  Returns:
+  * 400 Bad Request if steps is non-positive.
+  * 404 Not Found if the board is not found.
+  * 200 OK on successful computation.
+ 
+- **GET /api/boards/{id}/final?maxIterations={maxIterations}:** Retrieves the final (stable) board state.\
+
 Returns:
 
 * 400 Bad Request if maxIterations is non-positive.
 * 404 Not Found if the board is not found.
-* 200 OK with the board state otherwise.
+* 200 OK on successful computation.
 
 ---
 
