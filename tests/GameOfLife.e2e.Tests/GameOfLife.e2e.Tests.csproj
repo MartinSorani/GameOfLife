@@ -9,6 +9,13 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
+	<ItemGroup>
+		<None Update="..\..\allureConfig.json">
+			<Link>allureConfig.json</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Allure.Net.Commons" Version="2.12.1" />
     <PackageReference Include="Allure.Xunit" Version="2.12.1" />
@@ -22,9 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-	<None Update="allureConfig.json">
-		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
     <ProjectReference Include="..\..\src\GameOfLife.Api\GameOfLife.Api.csproj" />
   </ItemGroup>
 

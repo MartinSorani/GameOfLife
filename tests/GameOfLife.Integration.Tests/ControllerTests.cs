@@ -1,4 +1,6 @@
-﻿using GameOfLife.Api.Models;
+﻿using Allure.Xunit.Attributes;
+using Allure.Xunit.Attributes.Steps;
+using GameOfLife.Api.Models;
 using GameOfLife.Api.Utils;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +10,7 @@ using System.Net;
 
 namespace GameOfLife.Integration.Tests
 {
+    [AllureSuite("End-to-End Tests")]
     [Trait("Category", "Integration")]
     public class ControllerTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
     {
@@ -15,6 +18,7 @@ namespace GameOfLife.Integration.Tests
         public required RestClient _client;
         private readonly ILogger _logger;
 
+        [AllureBefore("Setup test context")]
         public ControllerTests(WebApplicationFactory<Program> factory)
         {
             // Use the provided factory for the initial tests.
@@ -25,11 +29,12 @@ namespace GameOfLife.Integration.Tests
             InitializeRestClient();
         }
 
+        /// <summary>
+        /// Initializes the REST client with the base URL from the factory.
+        /// </summary>
         private void InitializeRestClient()
         {
-            // Create a HttpClient from the factory.
             var httpClient = _factory.CreateClient();
-            // Use the HttpClient directly with RestSharp.
             _client = new RestClient(httpClient);
         }
 
@@ -49,9 +54,8 @@ namespace GameOfLife.Integration.Tests
             };
         }
 
-        /// <summary>
-        /// Tests that uploading a valid board returns an OK status and a non-empty GUID.
-        /// </summary>
+        [AllureDescription("Tests that uploading a valid board returns an OK status and a non-empty GUID.")]
+        [AllureFeature("Upload Board")]
         [Fact]
         public async Task UploadBoard_ValidBoard_ReturnsOk()
         {
@@ -69,9 +73,8 @@ namespace GameOfLife.Integration.Tests
             _logger.LogInformation("UploadBoard_ValidBoard_ReturnsOk test passed.");
         }
 
-        /// <summary>
-        /// Tests that uploading a null board returns a BadRequest status.
-        /// </summary>
+        [AllureDescription("Tests that uploading a null board returns a BadRequest status.")]
+        [AllureFeature("Upload Board")]
         [Fact]
         public async Task UploadBoard_NullBoard_ReturnsBadRequest()
         {
@@ -88,9 +91,8 @@ namespace GameOfLife.Integration.Tests
             _logger.LogInformation("UploadBoard_NullBoard_ReturnsBadRequest test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the next state of a valid board ID returns an OK status and a non-null board state.
-        /// </summary>
+        [AllureDescription("Tests that getting the next state of a valid board ID returns an OK status and a non-null board state.")]
+        [AllureFeature("Get Next State")]
         [Fact]
         public async Task GetNextState_ValidBoardId_ReturnsOk()
         {
@@ -113,9 +115,8 @@ namespace GameOfLife.Integration.Tests
             _logger.LogInformation("GetNextState_ValidBoardId_ReturnsOk test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the next state of an invalid board ID returns a NotFound status.
-        /// </summary>
+        [AllureDescription("Tests that getting the next state of an invalid board ID returns a NotFound status.")]
+        [AllureFeature("Get Next State")]
         [Fact]
         public async Task GetNextState_InvalidBoardId_ReturnsNotFound()
         {
@@ -129,9 +130,8 @@ namespace GameOfLife.Integration.Tests
             _logger.LogInformation("GetNextState_InvalidBoardId_ReturnsNotFound test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the state after a number of steps for a valid board ID returns an OK status and a non-null board state.
-        /// </summary>
+        [AllureDescription("Tests that getting the state after a number of steps for a valid board ID returns an OK status and a non-null board state.")]
+        [AllureFeature("Get State After Steps")]
         [Fact]
         public async Task GetStateAfterSteps_ValidBoardId_ReturnsOk()
         {
@@ -154,9 +154,8 @@ namespace GameOfLife.Integration.Tests
             _logger.LogInformation("GetStateAfterSteps_ValidBoardId_ReturnsOk test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the state after a number of steps for an invalid board ID returns a NotFound status.
-        /// </summary>
+        [AllureDescription("Tests that getting the state after a number of steps for an invalid board ID returns a NotFound status.")]
+        [AllureFeature("Get State After Steps")]
         [Fact]
         public async Task GetStateAfterSteps_InvalidBoardId_ReturnsNotFound()
         {
@@ -170,9 +169,8 @@ namespace GameOfLife.Integration.Tests
             _logger.LogInformation("GetStateAfterSteps_InvalidBoardId_ReturnsNotFound test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the state after a number of steps with negative steps returns a BadRequest status.
-        /// </summary>
+        [AllureDescription("Tests that getting the state after negative steps returns a BadRequest status.")]
+        [AllureFeature("Get State After Steps")]
         [Fact]
         public async Task GetStateAfterSteps_NegativeSteps_ReturnsBadRequest()
         {
@@ -192,9 +190,8 @@ namespace GameOfLife.Integration.Tests
             _logger.LogInformation("GetStateAfterSteps_NegativeSteps_ReturnsBadRequest test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the final state of a valid board ID returns an OK status and a non-null board state.
-        /// </summary>
+        [AllureDescription("Tests that getting the final state of a valid board ID returns an OK status and a non-null board state.")]
+        [AllureFeature("Get Final State")]
         [Fact]
         public async Task GetFinalState_ValidBoardId_ReturnsOk()
         {
@@ -217,9 +214,8 @@ namespace GameOfLife.Integration.Tests
             _logger.LogInformation("GetFinalState_ValidBoardId_ReturnsOk test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the final state of an invalid board ID returns a NotFound status.
-        /// </summary>
+        [AllureDescription("Tests that getting the final state of an invalid board ID returns a NotFound status.")]
+        [AllureFeature("Get Final State")]
         [Fact]
         public async Task GetFinalState_InvalidBoardId_ReturnsNotFound()
         {
@@ -233,9 +229,8 @@ namespace GameOfLife.Integration.Tests
             _logger.LogInformation("GetFinalState_InvalidBoardId_ReturnsNotFound test passed.");
         }
 
-        /// <summary>
-        /// Tests that getting the final state with non-positive max iterations returns a BadRequest status.
-        /// </summary>
+        [AllureDescription("Tests that getting the final state with non-positive max iterations returns a BadRequest status.")]
+        [AllureFeature("Get Final State")]
         [Fact]
         public async Task GetFinalState_NonPositiveMaxIterations_ReturnsBadRequest()
         {
@@ -257,6 +252,7 @@ namespace GameOfLife.Integration.Tests
         }
 
         // Clean up test data
+        [AllureAfter("Clean test context")]
         public void Dispose()
         {
             try
