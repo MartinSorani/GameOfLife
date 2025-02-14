@@ -6,7 +6,7 @@ A production-ready API implementation for [Conway’s Game of Life](https://en.w
 
 ## Table of Contents
 
-- [Rules of the Game](#rules-of-the-game)]
+- [Rules of the Game](#rules-of-the-game)
 - [Features](#features)
 - [Requirements](#requirements)
 - [Project Structure](#project-structure)
