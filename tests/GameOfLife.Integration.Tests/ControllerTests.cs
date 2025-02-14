@@ -10,7 +10,7 @@ using System.Net;
 
 namespace GameOfLife.Integration.Tests
 {
-    [AllureSuite("End-to-End Tests")]
+    [AllureSuite("Integration Tests")]
     [Trait("Category", "Integration")]
     public class ControllerTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
     {
