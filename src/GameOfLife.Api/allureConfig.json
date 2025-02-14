@@ -1,0 +1,12 @@
+{
+  "allure": {
+    "directory": "allure-results",
+    "title": "GameOfLife API E2E Test Report",
+    "links": [
+      "https://github.com/MartinSorani/GameOfLife/issues/{issue}"
+    ],
+    "failExceptions": [
+      "System.Exception"
+    ]
+  }
+}
