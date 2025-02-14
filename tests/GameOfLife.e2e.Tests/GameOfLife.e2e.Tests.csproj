@@ -10,13 +10,13 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<None Update="..\..\src\GameOfLife.Api\allureConfig.json">
+		<None Update="..\..\Solution Items\allureConfig.json">
 			<Link>allureConfig.json</Link>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <PackageReference Include="Allure.Net.Commons" Version="2.12.1" />
     <PackageReference Include="Allure.Xunit" Version="2.12.1" />
     <PackageReference Include="coverlet.collector" Version="3.2.0" />
