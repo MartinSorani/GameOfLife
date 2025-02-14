@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="allureConfig.json" />
     <Content Remove="appsettings.Development.json" />
   </ItemGroup>
 
