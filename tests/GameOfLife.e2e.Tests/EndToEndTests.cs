@@ -190,7 +190,7 @@ namespace GameOfLife.e2e.Tests
         public async Task GetNextState_ValidBoardId_ReturnsOk()
         {
             // Arrange
-            var boardId = CreateNewBoard();
+            var boardId = await CreateNewBoard();
 
             // Act
             var response = await AllureApi.Step(
