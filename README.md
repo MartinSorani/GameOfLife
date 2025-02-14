@@ -107,7 +107,7 @@ Conway's Game of Life is a cellular automaton devised by mathematician John Conw
  ┣ 📜allureConfig.json\
  ┣ 📜GameOfLife.sln\
  ┣ 📜nuget.config\
- ┗ 📜README.md\
+ ┗ 📜README.md
  
 ---
 
