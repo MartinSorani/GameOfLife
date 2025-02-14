@@ -45,7 +45,6 @@ A production-ready API implementation for [Conway’s Game of Life](https://en.w
 - [.NET 7.0 SDK](https://dotnet.microsoft.com/download/dotnet/7.0)
 - [Docker](https://www.docker.com/)
 - **NuGet Packages:**
-  - **API & Logging:** `Serilog`, `Serilog.AspNetCore`, `Serilog.Settings.Configuration`, `Serilog.Sinks.File`
   - **Testing & Reporting:** `Microsoft.AspNetCore.Mvc.Testing`, `RestSharp`, `Newtonsoft.Json`, `Swashbuckle.AspNetCore`, `Swashbuckle.AspNetCore.Filters`, `Allure.Net.Commons`, `Allure.Xunit`
 - **Optional:** Allure CLI for generating and viewing test reports  
   - [Allure CLI Installation Instructions](https://docs.qameta.io/allure/)
@@ -54,3 +53,207 @@ A production-ready API implementation for [Conway’s Game of Life](https://en.w
 
 ## Project Structure
 
+📦GameOfLife
+ ┣ 📂src
+ ┃ ┗ 📂GameOfLife.Api
+ ┃ ┃ ┣ 📂Controllers
+ ┃ ┃ ┃ ┗ 📜BoardsController.cs
+ ┃ ┃ ┣ 📂Examples
+ ┃ ┃ ┃ ┗ 📜BoardDtoExample.cs
+ ┃ ┃ ┣ 📂Models
+ ┃ ┃ ┃ ┣ 📜Board.cs
+ ┃ ┃ ┃ ┗ 📜BoardStateDto.cs
+ ┃ ┃ ┣ 📂Properties
+ ┃ ┃ ┃ ┗ 📜launchSettings.json
+ ┃ ┃ ┣ 📂Repositories
+ ┃ ┃ ┃ ┣ 📜FileBoardRepository.cs
+ ┃ ┃ ┃ ┣ 📜IBoardRepository.cs
+ ┃ ┃ ┃ ┗ 📜InMemoryBoardRepository.cs
+ ┃ ┃ ┣ 📂Services
+ ┃ ┃ ┃ ┣ 📜GameOfLifeService.cs
+ ┃ ┃ ┃ ┗ 📜IGameOfLifeService.cs
+ ┃ ┃ ┣ 📂Utils
+ ┃ ┃ ┃ ┣ 📜ArrayConverter.cs
+ ┃ ┃ ┃ ┣ 📜ConwayEngine.cs
+ ┃ ┃ ┃ ┣ 📜FileLogger.cs
+ ┃ ┃ ┃ ┗ 📜FileLoggerProvider.cs
+ ┃ ┃ ┣ 📜appsettings.json
+ ┃ ┃ ┣ 📜Dockerfile
+ ┃ ┃ ┗ 📜Program.cs
+ ┣ 📂tests
+ ┃ ┣ 📂GameOfLife.e2e.Tests
+ ┃ ┃ ┣ 📂Factories
+ ┃ ┃ ┃ ┗ 📜CustomWebApplicationFactory.cs
+ ┃ ┃ ┗ 📜EndToEndTests.cs
+ ┃ ┣ 📂GameOfLife.Integration.Tests
+ ┃ ┃ ┗ 📜ControllerTests.cs
+ ┃ ┣ 📂GameOfLife.Unit.Tests
+ ┃ ┃ ┣ 📜ConwayEngineTests.cs
+ ┃ ┃ ┗ 📜GameOfLifeServiceTests.cs
+ ┣ 📜.dockerignore
+ ┣ 📜.gitignore
+ ┣ 📜allureConfig.json
+ ┣ 📜GameOfLife.sln
+ ┣ 📜nuget.config
+ ┗ 📜README.md
+ 
+---
+
+## Configuration
+
+- **appsettings.json:** Contains configuration for logging, connection strings, and other runtime settings.
+- **allureConfig.json:** Defines Allure reporting options (output directory, report title, link patterns, etc.).  
+  Example:
+  ```json
+  {
+    "allure": {
+      "directory": "allure-results",
+      "title": "GameOfLife API E2E Test Report",
+      "links": [
+        "https://github.com/MartinSorani/GameOfLife/issues/{issue}"
+      ],
+      "failExceptions": [
+        "System.Exception"
+      ]
+    }
+  }
+- **nuget.config:** (Optional) Specifies package sources for NuGet package restoration.
+
+---
+
+## Building and Running
+
+### Local Development
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/MartinSorani/GameOfLife.git
+   cd GameOfLife
+
+   2. **Restore and build:**
+   ```bash
+dotnet restore
+dotnet build
+
+3. **Run the API:**
+   ```bash
+   dotnet run --project src/GameOfLife.Api
+
+   4. **Access the API:**
+The API should be available at the URLs specified in launchSettings.json (e.g., http://localhost:5042, https://localhost:7042).
+
+### Docker
+
+1. **Build the Docker image:**
+   ```bash
+   docker build -t gameoflife-api -f src/GameOfLife.Api/Dockerfile .
+
+2. **Run the Docker container:**
+   ```bash
+   docker run -d -p 5042:80 -p 7042:443 gameoflife-api
+
+3. **Access the API:**            
+Open your browser to http://localhost:5042, https://localhost:7042.
+
+---
+
+## API Endpoints
+
+- **POST /api/boards/upload:** Upload a new board state and receive a unique identifier (GUID).
+
+  Request Body:
+  ```json
+  {
+    "board": [
+      [true, false, true],
+      [false, true, false],
+      [true, false, true]
+    ]
+  }
+  ```
+  Response Body:
+  ```json
+  {
+    "id": "d7b3b3b3-0b3b-4b3b-8b3b-0b3b3b3b3b3b"
+  }
+  ```
+- **GET /api/boards/{id}/next:** Compute and retrieve the next generation of the board.
+- **GET /api/boards/{id}/states?steps={steps}:** Retrieve the board state after a specified number of generations.
+- **GET /api/boards/{id}/final?maxIterations={maxIterations}:** Retrieves the final (stable) board state.
+Returns:
+
+* 400 Bad Request if maxIterations is non-positive.
+* 404 Not Found if the board is not found.
+* 200 OK with the board state otherwise.
+
+---
+
+## Logging
+
+- **FileLogger:** Logs to a file in the logs directory (GameOfLife.Logs.txt).
+- **FileLoggerProvider:** Provides the FileLogger instance to the logging system.
+
+---
+
+## Testing
+
+### Unit Tests
+
+* Location: GameOfLife.UnitTests
+* Coverage: Core logic (e.g., ConwayEngine, array conversion, service methods)
+
+### Integration Tests
+
+* Location: GameOfLife.IntegrationTests
+* Coverage: API endpoints, error handling, and service interactions via WebApplicationFactory.
+
+### End-to-End Tests
+
+* Location: GameOfLife.e2e.Tests
+* Coverage: Full user workflows including board upload, next state, state after steps, final state, data persistence, and crash recovery.
+* **Allure Reporting:** Generates detailed test reports in the allure-results directory.
+* **Allure CLI:** Use the Allure CLI to generate and view the test reports.
+* **Allure CLI Command:**
+  ```bash
+  allure serve Path-to-report-folder/allure-results
+  ```
+* Running E2E Tests:
+  ```bash
+  dotnet test --filter TestCategory=E2E
+  ```
+
+  ---
+
+  ## Reporting with Allure
+
+  ### Configuration:
+Allure is configured via `allureConfig.json`. This file defines the output directory (default is "allure-results"), report title, and link patterns.
+
+### Running Tests with Allure Logger:
+Run tests with:
+```bash
+dotnet test --logger:"allure;ReportPath=allure-results"
+```
+
+This will generate raw results in the `allure-results` folder.
+
+### Generating the Report:
+After tests complete, generate the interactive report with the Allure CLI:
+```bash
+allure serve allure-results
+```
+
+### Test Annotations:
+- Use attributes such as `[AllureSuite]`, `[AllureSubSuite]`, `[AllureFeature]`, `[AllureStory]`, `[AllureSeverity]`, and `[AllureDescription]` on test classes and methods.
+- Use lambda steps (via `AllureApi.Step` and `AllureLifecycle.Instance.UpdateStep`) to annotate detailed steps in your tests.
+
+## Persistence and Crash Recovery
+
+### Persistence:
+Board states are persisted using a file-based repository (`FileBoardRepository`) that saves data to `boards.json`.
+
+### Crash Recovery:
+End-to-end tests simulate service restarts by disposing and recreating the `WebApplicationFactory`. This verifies that the board state persists across service restarts or crashes.
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
