@@ -217,6 +217,8 @@ Returns:
 * 404 Not Found if the board is not found.
 * 200 OK on successful computation.
 
+Find more details in the Swagger UI at [http://localhost:5042/swagger](http://localhost:5042/swagger).
+
 ---
 
 ## Logging
